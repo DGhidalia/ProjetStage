@@ -94,9 +94,28 @@ public class QuadtreeTest {
         expResult[1] = 0.798;
         expResult[2] = 0.973;
         double[] result = instance.rgbToHsv(rgb);
-        assertEquals(expResult[0], result[0],1);
+        assertEquals(expResult[0], result[0],0.5);
         assertEquals(expResult[1], result[1],0.05);
         assertEquals(expResult[2], result[2],0.05);
+        // TODO review the generated test code and remove the default call to fail.
+        //fail("The test case is a prototype.");
+    }
+    
+    @Test
+    public void testdistColors(){
+        System.out.println("DistDeuxCouleur");
+        double[] a = new double[3];
+        a[0] = 330;
+        a[1] = 0.798;
+        a[2] = 0.973;
+        double[] b = new double[3];
+        b[0] = 0;
+        b[1] = 0;
+        b[2] = 0.1;
+        Quadtree instance = new Quadtree(null);
+        double expResult = 0;
+        double result = instance.distColors(a, b);
+        assertEquals(expResult,result,0.5);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }

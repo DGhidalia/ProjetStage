@@ -62,7 +62,7 @@ public class Quadtree {
                         rgb = cvGet2D(src,y,x);
                         if(x <= 10){
                             rgb2 = cvGet2D(src,y,x*avancement);
-                            if(distDeuxCouleur(rgb,rgb2) < 5 || distDeuxCouleur(rgb,rgb2) > 5){
+                            if(distColors(rgb,rgb2) < 5 || distColors(rgb,rgb2) > 5){
                                 breakable = true;
                                 break;
                             }   
@@ -75,7 +75,7 @@ public class Quadtree {
                         rgb = cvGet2D(src,y,x);
                         if(x+1 < n.getWidth()){
                             rgb2 = cvGet2D(src,y,x+1);
-                            if(distDeuxCouleur(rgb,rgb2) < 5 || distDeuxCouleur(rgb,rgb2) > 5){
+                            if(distColors(rgb,rgb2) < 5 || distColors(rgb,rgb2) > 5){
                                 breakable = true;
                                 break;
                             }
@@ -283,7 +283,9 @@ public class Quadtree {
     }
     
     
-    private static double distDeuxCouleur(double[] a, double[] b){
-        return 0;
+    public double distColors(double[] a, double[] b){
+        return Math.pow(Math.sin((a[0]*Math.PI)/180)*a[1]*a[2] - Math.sin((b[0]*Math.PI)/180)*b[1]*b[2],2)
+                + Math.pow(Math.cos((a[0]*Math.PI)/180)*a[1]*a[2] - Math.cos((b[0]*Math.PI)/180)*b[1]*b[2],2)
+                + Math.pow(a[2]-b[2],2);
     }
 }
