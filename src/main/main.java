@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
-import quadtree.Segmentation;
+import quadtree.Quadtree;
 
 /**
  *
@@ -31,9 +31,9 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        Segmentation s = new Segmentation();
+        //Quadtree s = new Quadtree();
         
-        s.run(imread("C:\\Users\\david.ghidalia\\Documents\\PROJETJAVA\\result\\undistorted_perspective.jpg"));
+        //s.run(imread("C:\\Users\\david.ghidalia\\Documents\\PROJETJAVA\\result\\undistorted_perspective.jpg"));
         
         waitKey(0);
     }

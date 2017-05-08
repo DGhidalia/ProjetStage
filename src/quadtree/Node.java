@@ -5,6 +5,7 @@
  */
 package quadtree;
 
+import org.bytedeco.javacpp.opencv_core.CvRect;
 import org.bytedeco.javacpp.opencv_core.Mat;
 
 /**
@@ -20,17 +21,11 @@ public class Node {
     
     private Mat _img;
     
-    private int _height;
-    private int _width;
-    private int _x;
-    private int _y;
+    private CvRect _ROI;
     
-    public Node(int h, int w, int x, int y, Mat img){
-        this._height = h;
-        this._width = w;
-        this._x = x;
-        this._y = y;
-      
+    public Node(CvRect ROI, Mat img){
+        this._ROI = ROI;
+        
         this._img = img;
         
         this._NorthEast = null;
@@ -46,62 +41,6 @@ public class Node {
         else{
             return true;
         }
-    }
-    
-    /**
-     * @return the height
-     */
-    public int getHeight() {
-        return _height;
-    }
-
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(int height) {
-        this._height = height;
-    }
-
-    /**
-     * @return the width
-     */
-    public int getWidth() {
-        return _width;
-    }
-
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(int width) {
-        this._width = width;
-    }
-
-    /**
-     * @return the x
-     */
-    public int getX() {
-        return _x;
-    }
-
-    /**
-     * @param x the x to set
-     */
-    public void setX(int x) {
-        this._x = x;
-    }
-
-    /**
-     * @return the y
-     */
-    public int getY() {
-        return _y;
-    }
-
-    /**
-     * @param y the y to set
-     */
-    public void setY(int y) {
-        this._y = y;
     }
 
     /**
