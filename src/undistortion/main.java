@@ -6,8 +6,7 @@
 package undistortion;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import segmentation.RegionGrowing;
 
 /**
  *
@@ -17,7 +16,7 @@ public class main {
     
     public static void main(String[] args) throws IOException{        
                
-        String pathconf = "test.txt";
+        /*String pathconf = "test.txt";
         String pathImage = "test_img.jpg";
         
         try {
@@ -25,7 +24,11 @@ public class main {
             und.run();
         } catch (IOException ex) {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
+        
+        new RegionGrowing("C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg", 25, 98, 0.5);
+        
+        
     }
     
     
