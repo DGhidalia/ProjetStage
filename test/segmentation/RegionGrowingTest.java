@@ -6,6 +6,10 @@
 package segmentation;
 
 import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_core.IplImage;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_core.cvGet2D;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -74,14 +78,20 @@ public class RegionGrowingTest {
     @Test
     public void testDistRgb() {
         System.out.println("distRgb");
-        opencv_core.CvScalar first = null;
-        opencv_core.CvScalar second = null;
-        RegionGrowing instance = null;
+        
+        Mat mat = imread(this.getClass().getResource("testRegion.png").getPath());
+        IplImage img = new IplImage(mat);        
+        
+        opencv_core.CvScalar first = cvGet2D(img, 0, 0);
+        opencv_core.CvScalar second = cvGet2D(img, 1, 1);
+        RegionGrowing instance = new RegionGrowing("", 0, 0, 0);
         double expResult = 0.0;
         double result = instance.distRgb(first, second);
-        assertEquals(expResult, result, 0.0);
+        //assertEquals(expResult, result, 0.0);
+        assertTrue("ok", result<=0.2);
+        
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
     
 }

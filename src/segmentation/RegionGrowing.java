@@ -24,12 +24,14 @@ public class RegionGrowing {
 
     private HashMap<Pixel, Integer> blacklist = new HashMap(); //Blacklist for visited pixels
     private double gap; //Gap for color distance
+    private int test = 0;
 
     /**
      *
      * @param image_path
      * @param x
      * @param y
+     * @param gap
      */
     public RegionGrowing(String image_path, int x, int y, double gap) {
 
@@ -62,18 +64,24 @@ public class RegionGrowing {
      *
      * @param pixel
      * @param img
+     * @param region
      */
     public void testNeighbours(Pixel pixel, IplImage img, int region) {
 
+        System.out.println("ok" + test);
+        test++;
+
         blacklist.put(pixel, region);
 
-        CvScalar start_rgb = cvGet2D(img, pixel.getY(), pixel.getX()); //Initialize start pixel       
         int x = pixel.getX();
         int y = pixel.getY();
+        CvScalar start_rgb = cvGet2D(img, y, x); //Initialize start pixel       
 
         for (int ix = x - 1; ix <= x + 1; ix++) {
-            for (int iy = y - 1; iy <= y + 1; iy++) {                
-                this.rec(start_rgb, img, x, y, region);
+            for (int iy = y - 1; iy <= y + 1; iy++) {
+                if (ix > 0 || ix < img.width() || iy < img.height() || iy > 0) {
+                    this.rec(start_rgb, img, ix, iy, region);
+                }
             }
         }
 
@@ -96,11 +104,12 @@ public class RegionGrowing {
         //Check if in blacklist
         if (!blacklist.containsKey(new Pixel(x, y))) {
             //Check if in the same region
-            if (distRgb(start_rgb, cvGet2D(img, y, x - 1)) <= this.gap) {
-                testNeighbours(new Pixel(x - 1, y), img, region);
-            } else {
-                testNeighbours(new Pixel(x - 1, y), img, region + 1);
+            if (distRgb(start_rgb, cvGet2D(img, y, x)) <= this.gap) {
+                testNeighbours(new Pixel(x, y), img, region);
             }
+            /*else {
+                testNeighbours(new Pixel(x, y), img, region + 1);
+            }*/
 
         }
     }
