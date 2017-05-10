@@ -55,9 +55,11 @@ public class RegionGrowing {
 
         this.testNeighbours(pix, ipl, 1); //Every neighbours
 
-        namedWindow("test", WINDOW_NORMAL);
+        /*namedWindow("test", WINDOW_NORMAL);
         imshow("test", new Mat(ipl));
-        waitKey(0);
+        waitKey(0);*/
+        
+        System.out.println("Programme terminé");
     }
 
     /**
@@ -71,7 +73,9 @@ public class RegionGrowing {
         System.out.println("ok" + test);
         test++;
 
-        blacklist.put(pixel, region);
+        if (!blacklist.containsKey(pixel)) {
+            blacklist.put(pixel, region);
+        }
 
         int x = pixel.getX();
         int y = pixel.getY();
@@ -79,12 +83,31 @@ public class RegionGrowing {
 
         for (int ix = x - 1; ix <= x + 1; ix++) {
             for (int iy = y - 1; iy <= y + 1; iy++) {
-                if (ix > 0 || ix < img.width() || iy < img.height() || iy > 0) {
+                if (ix > 0 && ix < img.width() && iy < img.height() && iy > 0) {
                     this.rec(start_rgb, img, ix, iy, region);
                 }
             }
-        }
+        }       
 
+    }
+
+    /**
+     *
+     * @param start_rgb
+     * @param img
+     * @param x
+     * @param y
+     * @param region
+     */
+    private void rec(CvScalar start_rgb, IplImage img, int x, int y, int region) {
+        //Check if in blacklist
+        if (!blacklist.containsKey(new Pixel(x, y))) {
+            //Check if in the same region
+            if (distRgb(start_rgb, cvGet2D(img, y, x)) <= this.gap) {
+                blacklist.put(new Pixel(x, y), region);
+                testNeighbours(new Pixel(x, y), img, region);               
+            }
+        }
     }
 
     /**
@@ -98,20 +121,6 @@ public class RegionGrowing {
 
         return Math.sqrt(Math.pow(first.red() - second.red(), 2) + Math.pow((first.green() - second.green()), 2) + Math.pow((first.blue() - second.blue()), 2));
 
-    }
-
-    private void rec(CvScalar start_rgb, IplImage img, int x, int y, int region) {
-        //Check if in blacklist
-        if (!blacklist.containsKey(new Pixel(x, y))) {
-            //Check if in the same region
-            if (distRgb(start_rgb, cvGet2D(img, y, x)) <= this.gap) {
-                testNeighbours(new Pixel(x, y), img, region);
-            }
-            /*else {
-                testNeighbours(new Pixel(x, y), img, region + 1);
-            }*/
-
-        }
     }
 
 }

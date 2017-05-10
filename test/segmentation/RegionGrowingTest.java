@@ -85,10 +85,10 @@ public class RegionGrowingTest {
         opencv_core.CvScalar first = cvGet2D(img, 0, 0);
         opencv_core.CvScalar second = cvGet2D(img, 1, 1);
         RegionGrowing instance = new RegionGrowing("", 0, 0, 0);
-        double expResult = 0.0;
+        double gap = 0.0;
         double result = instance.distRgb(first, second);
         //assertEquals(expResult, result, 0.0);
-        assertTrue("ok", result<=0.2);
+        assertTrue("ok", result <= gap);
         
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
