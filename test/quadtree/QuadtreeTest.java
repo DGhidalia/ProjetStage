@@ -5,6 +5,13 @@
  */
 package quadtree;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.bytedeco.javacpp.opencv_core.CvRect;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Rect;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,7 +52,7 @@ public class QuadtreeTest {
         System.out.println("Segmentate");
         Node n = null;
         Quadtree instance = null;
-        instance.Segmentate(n);
+        instance.Segmentate();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -53,36 +60,39 @@ public class QuadtreeTest {
     /**
      * Test of Découpage method, of class Quadtree.
      */
-    @Test
-    public void testDécoupage() {
+   // @Test
+    /*public void testDécoupage() {
         System.out.println("D\u00e9coupage");
-        Node n = null;
-        Quadtree instance = null;
-        instance.Découpage(n);
+        Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier.png");
+        Node root = new Node(new Rect(0,0,img.size().width(),img.size().height()),img);
+        Quadtree instance = new Quadtree(root);
+        instance.Découpage();
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
 
     /**
      * Test of DetectionCouleur method, of class Quadtree.
      */
-    @Test
-    public void testDetectionCouleur() {
+   // @Test
+   /* public void testDetectionCouleur() {
         System.out.println("DetectionCouleur");
-        Node n = null;
-        Quadtree instance = null;
-        boolean expResult = false;
-        boolean result = instance.DetectionCouleur(n);
+        //Path directory = Paths.get("../ressource/testDamier.png");
+        Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier.png");
+        Node n = new Node(new Rect(0,0,img.size().width(),img.size().height()),img);
+        Quadtree instance = new Quadtree(n);
+        boolean expResult = true;
+        boolean result = instance.DetectionCouleur();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
 
     /**
      * Test of rgbToHsv method, of class Quadtree.
      */
-    @Test
-    public void testRgbToHsv() {
+    //@Test
+   /* public void testRgbToHsv() {
         System.out.println("rgbToHsv");
         double[] rgb = new double[3];
         rgb[0] = 248;
@@ -118,6 +128,6 @@ public class QuadtreeTest {
         assertEquals(expResult,result,0.5);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
-    }
+    }*/
     
 }
