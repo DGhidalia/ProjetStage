@@ -31,10 +31,10 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvRemap;
  *
  * @author jean-jacques
  */
-public class Undistort {
+public class Undistort implements Runnable{
 
-    private String pathimage;
-    private Cam2World model;
+    private final String pathimage;
+    private final Cam2World model;
     private final float SF = 3;     // Zoom factor 
 
     //-------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class Undistort {
      * Initialize the attributes of the class
      *
      * @param pathimage the path to the image you want to undistort
-     * @param pathConfig the path to the camara data config file
+     * @param pathConfig the path to the camera data configuration file
      * @throws IOException
      */
     public Undistort(String pathimage, String pathConfig) throws IOException {
@@ -52,10 +52,11 @@ public class Undistort {
 
     //-------------------------------------------------------------------------
     /**
-     * Run the different algorithms to undistord the image.
-     * Show the result in a window and save the undistorded 
-     * 
+     * Run the different algorithms to undistord the image. Show the result in a
+     * window and save the undistorded
+     *
      */
+    @Override
     public void run() {
 
         opencv_core.IplImage src1 = opencv_imgcodecs.cvLoadImage(this.pathimage);      // create an image object
@@ -89,7 +90,7 @@ public class Undistort {
 
     //-------------------------------------------------------------------------
     /**
-     * Undistort a perspective image using matrix. Create Look-Up-Table for
+     * undistort a perspective image using matrix. Create Look-Up-Table for
      * perspective undistortion The undistortion is done on a plane
      * perpendicular to the camera axis
      *
@@ -120,5 +121,4 @@ public class Undistort {
             }
         }
     }
-
 }

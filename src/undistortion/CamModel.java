@@ -20,10 +20,10 @@ import java.io.IOException;
  *
  * @author pierre.renard
  * @author cameron.mourot
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
-public class CamModel {
+public final class CamModel {
 
     private final int MAX_POL_LENGTH = 64;                  //Max size of the polynomials table
 
@@ -53,11 +53,9 @@ public class CamModel {
         this.parseDataFile(path);   //Call the parser   
 
     }
-    
-    
+
     //PARSER//
     //-------------------------------------------------------------------------
-    
     /**
      * Read a text file correctly filled with the camera data.
      * <p>
@@ -77,9 +75,11 @@ public class CamModel {
         BufferedReader txt;     //Buffer of the text file
         try {
             txt = new BufferedReader(new FileReader(new java.io.File(path)));
+
             if (txt == null) {
                 throw new FileNotFoundException("File not found : " + path);
             }
+
             try {
                 line = txt.readLine();
 
@@ -103,21 +103,22 @@ public class CamModel {
 
                 txt.close();
 
-            } catch (IOException e) {
-                System.out.println("Error ! " + e.getMessage());
+            } catch (IOException ex) {
+                System.out.println("Error ! " + ex.getMessage());
             }
 
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            txt.close();
+
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
         }
+
     }
-    
-    
+
     //SETTING THE PROPERTIES UP//
     //-------------------------------------------------------------------------
-
     /**
-     * Set the value of each property considering the line that is readed in the
+     * Set the value of each property considering the line that is read in the
      * file Following the value of the index, it fills :
      * <ul>
      * <li>pol : The polynomial coefficients
@@ -135,7 +136,6 @@ public class CamModel {
      * @param index Index of the data line
      */
     protected void setProperties(String[] table, int index) {
-       
 
         switch (index) {
 
@@ -193,13 +193,10 @@ public class CamModel {
                 System.out.println("Problem with the table");
                 break;
         }
-
     }
-    
-    
+
     //GETTERS AND SETTERS SECTION//
     //-------------------------------------------------------------------------
-
     /**
      * @return the MAX_POL_LENGTH
      */

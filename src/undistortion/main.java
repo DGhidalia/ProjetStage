@@ -11,15 +11,16 @@ import java.util.logging.Logger;
 
 /**
  *
+ * @author cameron.mourot
  * @author pierre.renard
  */
 public class main {
-    
-    public static void main(String[] args) throws IOException{        
-               
-        String pathconf = "test.txt";
+
+    public static void main(String[] args) throws IOException {
+
+        String pathconf = "cameraData.txt";
         String pathImage = "test_img.jpg";
-        
+
         try {
             Undistort und = new Undistort(pathImage, pathconf);
             und.run();
@@ -27,6 +28,4 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
 }

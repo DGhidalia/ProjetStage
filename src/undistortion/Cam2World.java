@@ -23,24 +23,21 @@ import static java.lang.Math.sqrt;
 public class Cam2World {
 
     //The camera properties
-    private CamModel model;
+    private final CamModel model;
 
     /**
      * Initialize the camera data from a text file The informations about the
      * norm of the text file are given in a sample text file
      *
-     * @param cameraDataPath Path to the txt file containing the camera data
+     * @param cameraDataPath Path to the text file containing the camera data
      * @throws IOException
      */
     public Cam2World(String cameraDataPath) throws IOException {
-
         this.model = new CamModel(cameraDataPath);
+    }
 
-    }    
-    
     //2D POINT TO 3D POINT//
     //-------------------------------------------------------------------------
-
     /**
      * Method to convert a 2D point in a 3D point by giving a table with the x
      * and y coordinates of a 2D point.
@@ -91,19 +88,18 @@ public class Cam2World {
 
         return point3D;
     }
-    
+
     //3D POINT TO 2D POINT//
     //-------------------------------------------------------------------------
-
     /**
      * Method to convert a 3D point in 2D points by giving a table with the x, y
      * and z coordinates of a 3D point.
      * <p>
      * It only converts one point using his coordinates, and not a whole image.
-     * This method is used to help the convetion of a 3D PointCloud into a 2D
-     * image. For exemple, if you undistort an image by using 3D Point Cloud
-     * convertion, you may use this method to pass it point by point in a 2D
-     * udistorded image.
+     * This method is used to help the conversion of a 3D PointCloud into a 2D
+     * image. For example, if you undistort an image by using 3D Point Cloud
+     * conversion, you may use this method to pass it point by point in a 2D
+     * undistorded image.
      *
      *
      * @param point3D Table of double that contains x, y and z coordinates
