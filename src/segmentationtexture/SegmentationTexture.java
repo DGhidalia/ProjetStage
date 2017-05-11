@@ -15,10 +15,10 @@ public class SegmentationTexture {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\undistorted_perspective.jpg";
+        
+        String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\building.jpg";
         Texture tex = new Texture(pathimage);
-        tex.run();  
+        tex.run();
        
     }
 }
