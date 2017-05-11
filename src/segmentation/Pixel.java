@@ -36,6 +36,40 @@ public class Pixel {
     public int getY() {
         return Y;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + this.X;
+        hash = 11 * hash + this.Y;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pixel other = (Pixel) obj;
+        if (this.X != other.X) {
+            return false;
+        }
+        if (this.Y != other.Y) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Pixel{" + "X=" + X + ", Y=" + Y + '}';
+    }
     
     
     

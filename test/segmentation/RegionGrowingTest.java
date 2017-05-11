@@ -6,10 +6,6 @@
 package segmentation;
 
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.IplImage;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.cvGet2D;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -43,31 +39,25 @@ public class RegionGrowingTest {
     }
 
     /**
-     * Test of algorithm method, of class RegionGrowing.
+     * Test of run method, of class RegionGrowing.
      */
     @Test
-    public void testAlgorithm() {
-        System.out.println("algorithm");
-        String image_path = "";
-        int x = 0;
-        int y = 0;
+    public void testRun() {
+        System.out.println("run");
         RegionGrowing instance = null;
-        instance.algorithm(image_path, x, y);
+        instance.run();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
     /**
-     * Test of testNeighbours method, of class RegionGrowing.
+     * Test of show method, of class RegionGrowing.
      */
     @Test
-    public void testTestNeighbours() {
-        System.out.println("testNeighbours");
-        Pixel pixel = null;
-        opencv_core.IplImage img = null;
-        int region = 0;
+    public void testShow() {
+        System.out.println("show");
         RegionGrowing instance = null;
-        instance.testNeighbours(pixel, img, region);
+        instance.show();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -78,20 +68,26 @@ public class RegionGrowingTest {
     @Test
     public void testDistRgb() {
         System.out.println("distRgb");
-        
-        Mat mat = imread(this.getClass().getResource("testRegion.png").getPath());
-        IplImage img = new IplImage(mat);        
-        
-        opencv_core.CvScalar first = cvGet2D(img, 0, 0);
-        opencv_core.CvScalar second = cvGet2D(img, 1, 1);
-        RegionGrowing instance = new RegionGrowing("", 0, 0, 0);
-        double gap = 0.0;
+        opencv_core.CvScalar first = null;
+        opencv_core.CvScalar second = null;
+        RegionGrowing instance = null;
+        double expResult = 0.0;
         double result = instance.distRgb(first, second);
-        //assertEquals(expResult, result, 0.0);
-        assertTrue("ok", result <= gap);
-        
+        assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
-        //fail("The test case is a prototype.");
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of main method, of class RegionGrowing.
+     */
+    @Test
+    public void testMain() {
+        System.out.println("main");
+        String[] args = null;
+        RegionGrowing.main(args);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
     
 }

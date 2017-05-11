@@ -5,26 +5,30 @@
  */
 package segmentation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.cvGet2D;
 import static org.bytedeco.javacpp.opencv_highgui.WINDOW_NORMAL;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_highgui.imshow;
 import static org.bytedeco.javacpp.opencv_highgui.namedWindow;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
  *
  * @author pierre.renard
  */
-public class RegionGrowing {
+public class RegionGrowing implements Runnable {
 
-    private HashMap<Pixel, Integer> blacklist = new HashMap(); //Blacklist for visited pixels
     private double gap; //Gap for color distance
     private int test = 0;
+    private String image_path;
+    private ArrayList<Pixel> pool; //List of pixels of the image
+    private HashMap<Region,Integer> regions_list;
+    private final IplImage ipl;
 
     /**
      *
@@ -33,83 +37,72 @@ public class RegionGrowing {
      * @param y
      * @param gap
      */
-    public RegionGrowing(String image_path, int x, int y, double gap) {
-
+    public RegionGrowing(String image_path, double gap) {
         this.gap = gap;
-        this.algorithm(image_path, x, y);
-
-    }
-
-    /**
-     *
-     * @param image_path
-     * @param x
-     * @param y
-     */
-    public void algorithm(String image_path, int x, int y) {
-
+        this.image_path = image_path;
+        this.pool = new ArrayList<>();
+        this.regions_list = new HashMap<>();
         Mat image = imread(image_path); //Initialize image 
-        IplImage ipl = new IplImage(image);
+        this.ipl = new IplImage(image);
+    }
 
-        Pixel pix = new Pixel(x, y);
+    /**
+     * Run the algorithm
+     */
+    @Override
+    public void run() {
+        System.out.println("algorithm");
 
-        this.testNeighbours(pix, ipl, 1); //Every neighbours
-
-        /*namedWindow("test", WINDOW_NORMAL);
-        imshow("test", new Mat(ipl));
-        waitKey(0);*/
+        //Create the pool of pixels from the image
+        for (int x = 0; x < this.ipl.width(); x++) {
+            for (int y = 0; y < this.ipl.height(); y++) {
+                this.pool.add(new Pixel(x, y));
+            }
+        }
         
-        System.out.println("Programme terminé");
+        int nbRegion = 0;
+
+        while (!this.pool.isEmpty()) {
+            
+            nbRegion++;
+            Pixel pix = this.pool.get((int) (Math.random() * this.pool.size())); //Get random Pixel in pool
+            Region reg = new Region();
+            reg.addMember(pix); //Add pixel to region
+            int x = pix.getX();
+            int y = pix.getY();
+
+            //Create a region
+            for (int i = 0; i <= reg.getMembers().size(); i++) {
+                //Each neighbour of the pixel
+                for (int ix = x - 1; ix <= x + 1; ix++) {
+                    for (int iy = y - 1; iy <= y + 1; iy++) {
+                        //Check distance in RGB
+                        if(this.distRgb(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix)) <= this.gap){
+                            reg.addMember(new Pixel(ix, iy));
+                        }
+                    }
+                }//End neighbours
+                
+            }//End create
+            
+            this.regions_list.put(reg, nbRegion);
+            this.pool.remove(pix);
+
+        }
+
     }
 
     /**
-     *
-     * @param pixel
-     * @param img
-     * @param region
+     * Show the image
      */
-    public void testNeighbours(Pixel pixel, IplImage img, int region) {
-
-        System.out.println("ok" + test);
-        test++;
-
-        if (!blacklist.containsKey(pixel)) {
-            blacklist.put(pixel, region);
-        }
-
-        int x = pixel.getX();
-        int y = pixel.getY();
-        CvScalar start_rgb = cvGet2D(img, y, x); //Initialize start pixel       
-
-        for (int ix = x - 1; ix <= x + 1; ix++) {
-            for (int iy = y - 1; iy <= y + 1; iy++) {
-                if (ix > 0 && ix < img.width() && iy < img.height() && iy > 0) {
-                    this.rec(start_rgb, img, ix, iy, region);
-                }
-            }
-        }       
-
+    public void show() {
+        // this.color();TODO 1.1 colorer l imqge 
+        namedWindow("test", WINDOW_NORMAL);
+        imshow("test", new Mat(this.ipl));
+        waitKey(0);
     }
 
-    /**
-     *
-     * @param start_rgb
-     * @param img
-     * @param x
-     * @param y
-     * @param region
-     */
-    private void rec(CvScalar start_rgb, IplImage img, int x, int y, int region) {
-        //Check if in blacklist
-        if (!blacklist.containsKey(new Pixel(x, y))) {
-            //Check if in the same region
-            if (distRgb(start_rgb, cvGet2D(img, y, x)) <= this.gap) {
-                blacklist.put(new Pixel(x, y), region);
-                testNeighbours(new Pixel(x, y), img, region);               
-            }
-        }
-    }
-
+    
     /**
      * Give the distance between two RGB pixels
      *
@@ -117,10 +110,16 @@ public class RegionGrowing {
      * @param second
      * @return
      */
-    public double distRgb(CvScalar first, CvScalar second) {
+    protected double distRgb(CvScalar first, CvScalar second) {
 
         return Math.sqrt(Math.pow(first.red() - second.red(), 2) + Math.pow((first.green() - second.green()), 2) + Math.pow((first.blue() - second.blue()), 2));
 
+    }
+    
+
+    public static void main(String[] args) {
+        RegionGrowing rg = new RegionGrowing("C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg", 1);
+        rg.run();
     }
 
 }

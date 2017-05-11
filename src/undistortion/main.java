@@ -26,7 +26,7 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        new RegionGrowing("C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg", 25, 68, 0.5);
+        new RegionGrowing("C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg", 50);
         
         
     }
