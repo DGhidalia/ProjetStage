@@ -5,7 +5,9 @@
  */
 package segmentation;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -13,23 +15,21 @@ import java.util.LinkedList;
  */
 class Region {
 
-    private LinkedList<Pixel> members; //Pixels of the region
+    private List<Pixel> members; //Pixels of the region
 
     public Region() {
-        this.members = new LinkedList<>();
+        this.members = new ArrayList<>();
     }
 
-    
-    
-    
     /**
      * Add a Pixel to the region
      *
      * @param member
      */
     public void addMember(Pixel member) {
-
-        this.members.push(member);
+        if (!this.members.contains(member)) {
+            this.members.add(member);
+        }
 
     }
 
@@ -37,8 +37,12 @@ class Region {
      *
      * @return
      */
-    public LinkedList<Pixel> getMembers() {
+    public List<Pixel> getMembers() {
         return members;
+    }
+
+    public int size() {
+        return members.size();
     }
 
 }
