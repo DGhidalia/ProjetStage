@@ -32,7 +32,7 @@ public class main {
         } catch (IOException ex) {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
-        opencv_core.Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier.png");
+        opencv_core.Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier2.jpg");
         
         Node instance = new Node(new opencv_core.Rect(0,0,img.size().width(),img.size().height()),img);
         

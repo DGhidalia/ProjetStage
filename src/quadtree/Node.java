@@ -8,6 +8,7 @@ package quadtree;
 import java.util.ArrayList;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.CvRect;
+import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Rect;
 import static org.bytedeco.javacpp.opencv_core.cvGet2D;
@@ -97,56 +98,103 @@ public class Node {
         Node SE = new Node(r4,this.getImg());
         this.setSouthEast(SE);
         rectangle(this.getImg(),r4,new opencv_core.Scalar(255,0,0,0),1,0,0);
-
+        
         namedWindow("test",WINDOW_NORMAL);
         imshow("test",this.getImg());
- 
+
         waitKey(0);
     }
     
-    
+    //TODO Fixer le out of range!!
     public boolean DetectionCouleur(){
-        boolean res = false;
         
-        int x = 0;
+         int x = 0;
         int y = 0;
+        int gap = 0;
         
         ArrayList<double[]> list = new ArrayList<double[]>();
         
         opencv_core.IplImage src = new opencv_core.IplImage(new Mat(this.getImg(),this.getROI()));
         
-        int avancement = 0;
-        
         if(this.getROI().width() > 20){
-            avancement = this.getROI().width()/10;
-        }
-        else{
-            avancement = 1;
-        }
+            int avancement = this.getROI().width()/10;
             
-        while((res == false) || (x <= this.getROI().width() && y <= this.getROI().height())){
-            if(x*avancement >= this.getROI().width()){
-                x = 0;
+            while(x <= this.getROI().width() && y <= this.getROI().height()){
+                if(x * avancement >= this.getROI().width()){
+                    x = 0;
+                    y++;
+                }
+
+                CvScalar _rgb = cvGet2D(src,y, x * avancement);
+
+                double[] rgb = new double[3];
+                rgb[0] = _rgb.val(3);
+                rgb[1] = _rgb.val(2);
+                rgb[2] = _rgb.val(1);
+                
+                rgb = rgbToHsv(rgb);
+
+                for (double[] ds : list) {
+                    if(this.distColors(ds, rgb) != gap){
+                        return true;
+                    }
+                }
+
+                list.add(rgb);
+                x++;
+            }
+        }
+        else if(this.getROI().height() > 20){
+            int avancement = this.getROI().width();
+            
+            while(x <= this.getROI().width() && y <= this.getROI().height()){
+                if(y * avancement >= this.getROI().height()){
+                    y = 0;
+                    x++;
+                }
+
+                CvScalar _rgb = cvGet2D(src, y * avancement, x);
+
+                double[] rgb = new double[3];
+                rgb[0] = _rgb.val(3);
+                rgb[1] = _rgb.val(2);
+                rgb[2] = _rgb.val(1);
+                
+                rgb = rgbToHsv(rgb);
+                
+                for (double[] ds : list) {
+                    if(this.distColors(ds, rgb) != gap){
+                        return true;
+                    }
+                }
+                
+                list.add(rgb);
                 y++;
             }
+        }
+        else{
+            for(x = 0;x < this.getROI().width(); x++){
+                for(y = 0; y < this.getROI().height(); y++){
+                    CvScalar _rgb = cvGet2D(src,y,x);
+                    
+                    double[] rgb = new double[3];
+                    rgb[0] = _rgb.val(3);
+                    rgb[1] = _rgb.val(2);
+                    rgb[2] = _rgb.val(1);
 
-            opencv_core.CvScalar _rgb = cvGet2D(src,y, x * avancement);
-
-            double[] rgb = new double[3];
-            rgb[0] = _rgb.val(3);
-            rgb[1] = _rgb.val(2);
-            rgb[2] = _rgb.val(1);
-
-            for (double[] ds : list) {
-                if(this.distColors(ds, rgb) != 0){
-                    res = true;
+                    rgb = rgbToHsv(rgb);
+                    
+                    for (double[] ds : list) {
+                        if(this.distColors(ds, rgb) != gap){
+                            return true;
+                        }
+                    }
+                    
+                    list.add(rgb);
                 }
             }
-            
-            list.add(rgb);
-            x++;
-        }     
-        return res;
+        }
+        return false;
     }
     
     public double[] rgbToHsv(double[] rgb){
@@ -205,6 +253,10 @@ public class Node {
         return Math.pow(Math.sin((a[0]*Math.PI)/180)*a[1]*a[2] - Math.sin((b[0]*Math.PI)/180)*b[1]*b[2],2)
                 + Math.pow(Math.cos((a[0]*Math.PI)/180)*a[1]*a[2] - Math.cos((b[0]*Math.PI)/180)*b[1]*b[2],2)
                 + Math.pow(a[2]-b[2],2);
+    }
+    
+    public double distColorsRGB(double[] a, double[] b){
+        return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
     
     public boolean isLeaf(){

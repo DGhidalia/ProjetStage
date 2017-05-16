@@ -89,14 +89,18 @@ public class NodeTest {
     @Test
     public void testDistColors() {
         System.out.println("distColors");
-        double[] a = null;
-        double[] b = null;
-        Node instance = null;
+        double[] a = new double[3];
+        double[] b = new double[3];
+        for(int i = 0;i<3;i++){
+            a[i] = 255;
+            b[i] = 255;
+        }
+        Node instance = new Node(null,null);
         double expResult = 0.0;
         double result = instance.distColors(a, b);
         assertEquals(expResult, result, 0.0);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
 
     /**
