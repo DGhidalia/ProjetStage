@@ -28,8 +28,13 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        RegionGrowing rg = new RegionGrowing("C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg", 20);
-        rg.run();
+        String img_path = "C:\\Users\\pierre.renard\\Desktop\\ProjetStage\\ProjetStage\\undistorted_perspective.jpg";        
+                        
+        RegionGrowing rg = new RegionGrowing(img_path, 20);
+        
+        //rg.run();
+        
+        
         
         
     }

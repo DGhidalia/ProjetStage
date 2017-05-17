@@ -6,17 +6,20 @@
 package segmentation;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This class represents a region of pixels of an image. 
  *
  * @author pierre.renard
  */
 class Region {
 
-    private List<Pixel> members; //Pixels of the region
+    private final List<Pixel> members; //Pixels of the region
 
+    /**
+     * Initialize the properties
+     */
     public Region() {
         this.members = new ArrayList<>();
     }
@@ -33,6 +36,9 @@ class Region {
 
     }
 
+    //--------------------------------------------------------------------------
+    //GETTERS
+    //--------------------------------------------------------------------------
     /**
      *
      * @return
@@ -41,6 +47,11 @@ class Region {
         return members;
     }
 
+    /**
+     * Get the size of the list of members
+     *
+     * @return
+     */
     public int size() {
         return members.size();
     }

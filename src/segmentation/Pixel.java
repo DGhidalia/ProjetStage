@@ -6,7 +6,7 @@
 package segmentation;
 
 /**
- *
+ * This class represents a pixel, by his coordinates, from an image.
  * @author pierre.renard
  */
 public class Pixel {

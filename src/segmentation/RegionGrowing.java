@@ -5,10 +5,8 @@
  */
 package segmentation;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -25,17 +23,18 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public class RegionGrowing implements Runnable {
 
-    private double gap; //Gap for color distance
-    private int test = 0;
-    private String image_path;
-    private ArrayList<Pixel> pool; //List of pixels of the image
-    private HashMap<Region, Integer> regions_list;
-    private final IplImage ipl;
-
+    private final double gap; //Gap for color distance
+    private final int test = 0; //Test counter
+    private final String image_path;
+    private final ArrayList<Pixel> pool; //List of pixels of the image
+    private final HashMap<Region, Integer> regions_list; //List of regions of the image
+    private final IplImage ipl; //Source image converted to IPL format
     /**
+     * Initialize the properties using an image path
      *
      * @param image_path
-     * @param gap
+     * @param gap distance between two colors to consider them as different
+     * colors
      */
     public RegionGrowing(String image_path, double gap) {
         this.gap = gap;
@@ -44,11 +43,11 @@ public class RegionGrowing implements Runnable {
         this.regions_list = new HashMap<>();
         Mat image = imread(image_path); //Initialize image 
         this.ipl = new IplImage(image);
-    }
-
+    }    
     
+
     /**
-     * Run the algorithm
+     * Run the region growing algorithm on the given image
      */
     @Override
     public void run() {
@@ -83,9 +82,7 @@ public class RegionGrowing implements Runnable {
                             if (this.distRgb(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix)) <= this.gap) {
                                 reg.addMember(p);//Add pixel to region
                                 this.pool.remove(p);//Remove added pixel
-                                // System.out.println(this.pool.size()+" / "+reg.getMembers().size());
                             }
-                            //}
                         }
                     }
                 }//End neighbours
@@ -99,9 +96,11 @@ public class RegionGrowing implements Runnable {
         System.out.println("Traitement regions terminé");
     }
 
-
+    //--------------------------------------------------------------------------
+    //METHODS
+    //--------------------------------------------------------------------------
     /**
-     * Show the image
+     * Show the final image
      */
     public void show() {
         // this.color();
@@ -123,7 +122,8 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
-     * Gives the color distance between two RGB pixels
+     * Gives the color distance between two RGB pixels. Use the method cvGet2D()
+     * to get a Scalar from a pixel.
      *
      * @param first
      * @param second
@@ -134,29 +134,65 @@ public class RegionGrowing implements Runnable {
 
     }
     
-    
+    /**
+     * 
+     */
+    private void getPyramid(){
+        
+                
+    }
+
+    //--------------------------------------------------------------------------
+    //GETTERS
+    //--------------------------------------------------------------------------
+    /**
+     *
+     * @return
+     */
     public int getTest() {
         return test;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getImage_path() {
         return image_path;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Pixel> getPool() {
         return pool;
     }
 
+    /**
+     *
+     * @return
+     */
     public HashMap<Region, Integer> getRegions_list() {
         return regions_list;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getGap() {
         return gap;
     }
-    
+
+    /**
+     *
+     * @return
+     */
     public IplImage getIpl() {
         return ipl;
     }
+    
+    
 
 }
