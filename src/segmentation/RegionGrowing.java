@@ -27,8 +27,9 @@ public class RegionGrowing implements Runnable {
     private final int test = 0; //Test counter
     private final String image_path;
     private final ArrayList<Pixel> pool; //List of pixels of the image
-    private final HashMap<Region, Integer> regions_list; //List of regions of the image
+    private final HashMap<Integer, Region> regions_list; //List of regions of the image
     private final IplImage ipl; //Source image converted to IPL format
+
     /**
      * Initialize the properties using an image path
      *
@@ -43,8 +44,7 @@ public class RegionGrowing implements Runnable {
         this.regions_list = new HashMap<>();
         Mat image = imread(image_path); //Initialize image 
         this.ipl = new IplImage(image);
-    }    
-    
+    }
 
     /**
      * Run the region growing algorithm on the given image
@@ -89,11 +89,13 @@ public class RegionGrowing implements Runnable {
 
             }//End create
 
-            this.regions_list.put(reg, nbRegion); //Add the region to the regions list
+            this.regions_list.put(nbRegion, reg); //Add the region to the regions list
             this.pool.remove(pix); //Remove the pixel from the pixels list
         }
 
         System.out.println("Traitement regions terminé");
+        
+        this.show();
     }
 
     //--------------------------------------------------------------------------
@@ -103,10 +105,10 @@ public class RegionGrowing implements Runnable {
      * Show the final image
      */
     public void show() {
-        // this.color();
-        //TODO 1.1 colorer l imqge 
+        this.color();
+        Mat keu = new Mat(this.ipl);
         namedWindow("test", WINDOW_NORMAL);
-        imshow("test", new Mat(this.ipl));
+        imshow("test", keu);
         waitKey(0);
     }
 
@@ -133,13 +135,71 @@ public class RegionGrowing implements Runnable {
         return Math.sqrt(Math.pow(first.red() - second.red(), 2) + Math.pow((first.green() - second.green()), 2) + Math.pow((first.blue() - second.blue()), 2));
 
     }
-    
+
     /**
-     * 
+     * Color the image depending on the regions
      */
-    private void getPyramid(){
-        
-                
+    private void color() {
+
+        //read the list of the regions to treat each of them
+        for (int i = 0; i < this.regions_list.size(); i++) {
+
+            //Total value of each color for each region
+            double totRed = 0;
+            double totGreen = 0;
+            double totBlue = 0;
+            //Counter
+            int count = 0;
+
+            //Treatment of each region of the list
+            for (int j = 0; j < this.regions_list.get(i).size(); j++) {
+
+                Region r = this.regions_list.get(i);
+
+                //Treatment of each pixel of the current region
+                for (int k = 0; k < r.getMembers().size(); k++) {
+                    Pixel pix = r.getMembers().get(j);
+                    //Get the RGB value of the current pixel
+                    double red = cvGet2D(this.ipl, pix.getY(), pix.getX()).red();
+                    double green = cvGet2D(this.ipl, pix.getY(), pix.getX()).green();
+                    double blue = cvGet2D(this.ipl, pix.getY(), pix.getX()).blue();
+
+                    totRed += red;
+                    totGreen += green;
+                    totBlue += blue;
+                    count++;
+                }
+
+                double moyRed = totRed / count;
+                double moyGreen = totGreen / count;
+                double moyBlue = totBlue / count;
+
+                this.regionColor(moyRed, moyGreen, moyBlue, i);
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Color all the pixels of a region with the average color of all those
+     * pixels. Sub function only used with the global coloring function.
+     *
+     * @param avgRed
+     * @param avgGreen
+     * @param avgBlue
+     * @param index
+     */
+    private void regionColor(double avgRed, double avgGreen, double avgBlue, int index) {
+        Region r = this.regions_list.get(index);
+        for (int i = 0; i < this.regions_list.get(index).size(); i++) {
+            Pixel pix = r.getMembers().get(i);
+            cvGet2D(this.ipl, pix.getY(), pix.getX()).red(avgRed);
+            cvGet2D(this.ipl, pix.getY(), pix.getX()).green(avgGreen);
+            cvGet2D(this.ipl, pix.getY(), pix.getX()).blue(avgBlue);
+
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -173,7 +233,7 @@ public class RegionGrowing implements Runnable {
      *
      * @return
      */
-    public HashMap<Region, Integer> getRegions_list() {
+    public HashMap<Integer, Region> getRegions_list() {
         return regions_list;
     }
 
@@ -192,7 +252,5 @@ public class RegionGrowing implements Runnable {
     public IplImage getIpl() {
         return ipl;
     }
-    
-    
 
 }

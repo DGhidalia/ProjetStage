@@ -7,20 +7,25 @@ package segmentation;
 
 /**
  * This class represents a pixel, by his coordinates, from an image.
+ *
  * @author pierre.renard
  */
 public class Pixel {
-    
-    
-    private int X;
-    private int Y;
-    
-    
-    public Pixel(int x, int y){
-        
+
+    private int X; //Coordinate on X axis
+    private int Y; //Coordinate on Y axis
+
+    /**
+     * Initialize coordinates of the pixel
+     *
+     * @param x
+     * @param y
+     */
+    public Pixel(int x, int y) {
+
         this.X = x;
         this.Y = y;
-        
+
     }
 
     /**
@@ -37,6 +42,10 @@ public class Pixel {
         return Y;
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -45,6 +54,11 @@ public class Pixel {
         return hash;
     }
 
+    /**
+     * 
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -66,11 +80,13 @@ public class Pixel {
         return true;
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
         return "Pixel{" + "X=" + X + ", Y=" + Y + '}';
     }
-    
-    
-    
+
 }
