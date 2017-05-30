@@ -55,7 +55,7 @@ public class RegionGrowingTest {
     public void testRun() {
         System.out.println("run");
         String absolutePath = new File(this.getClass().getResource("testRegion.png").getPath()).getAbsolutePath();
-          RegionGrowing rg = new RegionGrowing(absolutePath, 0);
+          RegionGrowing rg = new RegionGrowing(absolutePath, 0, true);
         rg.run();
        
         int size = rg.getRegions_list().values().size();
@@ -78,7 +78,7 @@ public class RegionGrowingTest {
     public void testDistRgb() {
         System.out.println("distRgb");
           String absolutePath = new File(this.getClass().getResource("testRegion.png").getPath()).getAbsolutePath();
-           RegionGrowing rg = new RegionGrowing(absolutePath, 200000);
+           RegionGrowing rg = new RegionGrowing(absolutePath, 200000, true);
         //rg.run();
         opencv_core.IplImage im = rg.getIpl();
         opencv_core.CvScalar first = cvGet2D(im,0,0);
