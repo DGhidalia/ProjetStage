@@ -32,7 +32,7 @@ public class main {
         nomImg = "testPyramid.jpg";
         String img_path = "C:\\Users\\pierre.renard\\Documents\\NetBeansProjects\\ProjetStage\\"+nomImg;        
                         
-        RegionGrowing rg = new RegionGrowing(img_path,6.06 ,true);
+        RegionGrowing rg = new RegionGrowing(img_path,6.5 ,true);
         
         rg.run();
         

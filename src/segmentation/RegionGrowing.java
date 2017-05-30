@@ -31,8 +31,10 @@ public class RegionGrowing implements Runnable {
     private final String image_path;
     private final ArrayList<Pixel> pool; //List of pixels of the image
     private final HashMap<Integer, Region> regions_list; //List of regions of the image
+    private final HashMap<Integer, Region> rejected_regions;//List of not taken regions
     private final IplImage ipl; //Source image converted to IPL format
     private boolean isRgb;
+    int TAILLE_REG_MIN;
 
     /**
      * Initialize the properties using an image path
@@ -46,9 +48,11 @@ public class RegionGrowing implements Runnable {
         this.image_path = image_path;
         this.pool = new ArrayList<>();
         this.regions_list = new HashMap<>();
+        this.rejected_regions = new HashMap<>();
         Mat image = imread(this.image_path); //Initialize image 
         this.ipl = new IplImage(image);
         this.isRgb = rgb;
+        this.TAILLE_REG_MIN = (int) (this.ipl.width() * this.ipl.height() * 0.0005);
     }
 
     /**
@@ -62,7 +66,7 @@ public class RegionGrowing implements Runnable {
 
         System.out.println("Traitement image terminé");
 
-        int nbRegion = 0; //Actual region number
+        int nbRegion = 1; //Actual region number
 
         System.out.println("Traitement regions");
 
@@ -87,40 +91,46 @@ public class RegionGrowing implements Runnable {
                             double distance;
                             if (this.isRgb) {
                                 distance = this.distRgb(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix));
-                            }
-                            else{
+                            } else {
                                 distance = this.distHsv(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix));
                             }
-                                if ( distance <= this.gap) {
-                                    reg.addMember(p);//Add pixel to region
-                                    this.pool.remove(p);//Remove added pixel
-                                }
+                            if (distance <= this.gap) {
+                                reg.addMember(p);//Add pixel to region
+                                this.pool.remove(p);//Remove added pixel
                             }
                         }
-                    }//End neighbours
+                    }
+                }//End neighbours
 
-                }//End create
+            }//End create            
 
-                this.regions_list.put(nbRegion, reg); //Add the region to the regions list
-                this.pool.remove(pix); //Remove the pixel from the pixels list
+            if (reg.size() >= TAILLE_REG_MIN) {
+                this.regions_list.put(nbRegion, reg); //Add the region to the regions list                
+            } else {
+                this.rejected_regions.put(nbRegion, reg);
             }
-
-            System.out.println("Traitement regions terminé");
-
-            this.show();
+            this.pool.remove(pix); //Remove the pixel from the pixels list
         }
-        //--------------------------------------------------------------------------
-        //METHODS
-        //--------------------------------------------------------------------------
-        /**
-         * Show the final image
-         */
+
+        System.out.println("Traitement regions terminé");
+
+        this.show();
+    }
+    //--------------------------------------------------------------------------
+    //METHODS
+    //--------------------------------------------------------------------------
+
+    /**
+     * Show the final image
+     */
     public void show() {
+        System.out.println("Colorisation en cours");
         IplImage color = this.color();
         Mat img = new Mat(color);
         namedWindow("test", WINDOW_NORMAL);
         imshow("test", img);
         imwrite("regionsResult.jpg", img);
+        System.out.println("Colorisation terminée");
         waitKey(0);
     }
 
@@ -160,7 +170,6 @@ public class RegionGrowing implements Runnable {
         double[] rgbToHsv1 = RgbToHsv.rgbToHsv(firstTab);
         double[] rgbToHsv2 = RgbToHsv.rgbToHsv(secondTab);
 
-        
         return RgbToHsv.distColors(rgbToHsv1, rgbToHsv2);
     }
 
@@ -173,6 +182,7 @@ public class RegionGrowing implements Runnable {
 
         IplImage clone = this.ipl.clone();
         Collection<Region> values = this.regions_list.values();
+        Collection<Region> dark = this.rejected_regions.values();
 
         values.forEach((r) -> {
             //Total value of each color for each region
@@ -182,6 +192,11 @@ public class RegionGrowing implements Runnable {
             //Counter
             List<Pixel> listPixel = r.getMembers();
             this.regionColor(totRed, totGreen, totBlue, listPixel, clone);
+        });
+
+        dark.forEach((r) -> {
+            List<Pixel> listPixel = r.getMembers();
+            this.regionColor(0, 0, 0, listPixel, clone);
         });
 
         return clone;
