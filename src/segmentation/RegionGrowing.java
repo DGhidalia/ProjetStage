@@ -6,7 +6,12 @@
 package segmentation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import org.bytedeco.javacpp.indexer.Indexer;
+import org.bytedeco.javacpp.indexer.UByteIndexer;
+import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -16,6 +21,7 @@ import static org.bytedeco.javacpp.opencv_highgui.imshow;
 import static org.bytedeco.javacpp.opencv_highgui.namedWindow;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 /**
  *
@@ -24,7 +30,6 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 public class RegionGrowing implements Runnable {
 
     private final double gap; //Gap for color distance
-    private final int test = 0; //Test counter
     private final String image_path;
     private final ArrayList<Pixel> pool; //List of pixels of the image
     private final HashMap<Integer, Region> regions_list; //List of regions of the image
@@ -42,7 +47,7 @@ public class RegionGrowing implements Runnable {
         this.image_path = image_path;
         this.pool = new ArrayList<>();
         this.regions_list = new HashMap<>();
-        Mat image = imread(image_path); //Initialize image 
+        Mat image = imread(this.image_path); //Initialize image 
         this.ipl = new IplImage(image);
     }
 
@@ -94,7 +99,7 @@ public class RegionGrowing implements Runnable {
         }
 
         System.out.println("Traitement regions terminé");
-        
+
         this.show();
     }
 
@@ -105,10 +110,11 @@ public class RegionGrowing implements Runnable {
      * Show the final image
      */
     public void show() {
-        this.color();
-        Mat keu = new Mat(this.ipl);
+        IplImage color = this.color();
+        Mat img = new Mat(color);
         namedWindow("test", WINDOW_NORMAL);
-        imshow("test", keu);
+        imshow("test", img);
+        imwrite("regionsResult.jpg", img);
         waitKey(0);
     }
 
@@ -138,47 +144,25 @@ public class RegionGrowing implements Runnable {
 
     /**
      * Color the image depending on the regions
+     *
+     * @return
      */
-    private void color() {
+    private IplImage color() {
 
-        //read the list of the regions to treat each of them
-        for (int i = 0; i < this.regions_list.size(); i++) {
+        IplImage clone = this.ipl.clone();
+        Collection<Region> values = this.regions_list.values();
 
+        values.forEach((r) -> {
             //Total value of each color for each region
-            double totRed = 0;
-            double totGreen = 0;
-            double totBlue = 0;
+            int totRed = (int) (Math.random() * 255);
+            int totGreen = (int) (Math.random() * 255);
+            int totBlue = (int) (Math.random() * 255);
             //Counter
-            int count = 0;
+            List<Pixel> listPixel = r.getMembers();
+            this.regionColor(totRed, totGreen, totBlue, listPixel, clone);
+        });
 
-            //Treatment of each region of the list
-            for (int j = 0; j < this.regions_list.get(i).size(); j++) {
-
-                Region r = this.regions_list.get(i);
-
-                //Treatment of each pixel of the current region
-                for (int k = 0; k < r.getMembers().size(); k++) {
-                    Pixel pix = r.getMembers().get(j);
-                    //Get the RGB value of the current pixel
-                    double red = cvGet2D(this.ipl, pix.getY(), pix.getX()).red();
-                    double green = cvGet2D(this.ipl, pix.getY(), pix.getX()).green();
-                    double blue = cvGet2D(this.ipl, pix.getY(), pix.getX()).blue();
-
-                    totRed += red;
-                    totGreen += green;
-                    totBlue += blue;
-                    count++;
-                }
-
-                double moyRed = totRed / count;
-                double moyGreen = totGreen / count;
-                double moyBlue = totBlue / count;
-
-                this.regionColor(moyRed, moyGreen, moyBlue, i);
-
-            }
-
-        }
+        return clone;
 
     }
 
@@ -186,33 +170,26 @@ public class RegionGrowing implements Runnable {
      * Color all the pixels of a region with the average color of all those
      * pixels. Sub function only used with the global coloring function.
      *
-     * @param avgRed
-     * @param avgGreen
-     * @param avgBlue
+     * @param red
+     * @param green
+     * @param blue
      * @param index
      */
-    private void regionColor(double avgRed, double avgGreen, double avgBlue, int index) {
-        Region r = this.regions_list.get(index);
-        for (int i = 0; i < this.regions_list.get(index).size(); i++) {
-            Pixel pix = r.getMembers().get(i);
-            cvGet2D(this.ipl, pix.getY(), pix.getX()).red(avgRed);
-            cvGet2D(this.ipl, pix.getY(), pix.getX()).green(avgGreen);
-            cvGet2D(this.ipl, pix.getY(), pix.getX()).blue(avgBlue);
+    private void regionColor(int red, int green, int blue, List<Pixel> listPixel, IplImage clone) {
+        UByteIndexer index = clone.createIndexer();
+        for (int i = 0; i < listPixel.size(); i++) {
+            Pixel pix = listPixel.get(i);
 
+            index.put(pix.getY(), pix.getX(), 0, red);
+            index.put(pix.getY(), pix.getX(), 1, green);
+            index.put(pix.getY(), pix.getX(), 2, blue);
         }
+        index.release();
     }
 
     //--------------------------------------------------------------------------
     //GETTERS
     //--------------------------------------------------------------------------
-    /**
-     *
-     * @return
-     */
-    public int getTest() {
-        return test;
-    }
-
     /**
      *
      * @return
