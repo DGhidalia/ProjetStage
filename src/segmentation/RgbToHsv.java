@@ -11,7 +11,7 @@ package segmentation;
  */
 public class RgbToHsv {
 
-    public double[] rgbToHsv(double[] rgb) {
+    public static double[] rgbToHsv(double[] rgb) {
         if (rgb.length == 3 && rgb[1] <= 255 && 0 <= rgb[1] && 0 <= rgb[2] && rgb[2] <= 255 && 0 <= rgb[0] && rgb[0] <= 255) {
             double[] res = new double[3];
             double R = rgb[0] / 255;
@@ -58,10 +58,14 @@ public class RgbToHsv {
         }
     }
 
-    public double distColors(double[] a, double[] b) {
+    public static double distColors(double[] a, double[] b) {
         return Math.pow(Math.sin((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.sin((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
                 + Math.pow(Math.cos((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.cos((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
                 + Math.pow(a[2] - b[2], 2);
+   //return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2)+Math.pow(a[2]-b[2],2));
+//           (a[0]) / 180) * a[1] * a[2] - Math.sin((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
+//                + Math.pow(Math.cos((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.cos((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
+//                + Math.pow(a[2] - b[2], 2);
     }
 
 }

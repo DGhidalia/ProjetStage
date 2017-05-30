@@ -28,10 +28,11 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        String nomImg = "testPyramid.jpg";
+        String nomImg = "PyramidDown.jpg";
+        nomImg = "testPyramid.jpg";
         String img_path = "C:\\Users\\pierre.renard\\Documents\\NetBeansProjects\\ProjetStage\\"+nomImg;        
                         
-        RegionGrowing rg = new RegionGrowing(img_path, 10);
+        RegionGrowing rg = new RegionGrowing(img_path,6.06 ,true);
         
         rg.run();
         

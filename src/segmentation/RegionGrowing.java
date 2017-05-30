@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import org.bytedeco.javacpp.indexer.Indexer;
 import org.bytedeco.javacpp.indexer.UByteIndexer;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -34,6 +32,7 @@ public class RegionGrowing implements Runnable {
     private final ArrayList<Pixel> pool; //List of pixels of the image
     private final HashMap<Integer, Region> regions_list; //List of regions of the image
     private final IplImage ipl; //Source image converted to IPL format
+    private boolean isRgb;
 
     /**
      * Initialize the properties using an image path
@@ -42,13 +41,14 @@ public class RegionGrowing implements Runnable {
      * @param gap distance between two colors to consider them as different
      * colors
      */
-    public RegionGrowing(String image_path, double gap) {
+    public RegionGrowing(String image_path, double gap, boolean rgb) {
         this.gap = gap;
         this.image_path = image_path;
         this.pool = new ArrayList<>();
         this.regions_list = new HashMap<>();
         Mat image = imread(this.image_path); //Initialize image 
         this.ipl = new IplImage(image);
+        this.isRgb = rgb;
     }
 
     /**
@@ -84,31 +84,37 @@ public class RegionGrowing implements Runnable {
                         //Check if the pixel is ok to be visited
                         if (this.pool.contains(p)) {
                             //Check distance in RGB
-                            if (this.distRgb(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix)) <= this.gap) {
-                                reg.addMember(p);//Add pixel to region
-                                this.pool.remove(p);//Remove added pixel
+                            double distance;
+                            if (this.isRgb) {
+                                distance = this.distRgb(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix));
+                            }
+                            else{
+                                distance = this.distHsv(cvGet2D(this.ipl, y, x), cvGet2D(this.ipl, iy, ix));
+                            }
+                                if ( distance <= this.gap) {
+                                    reg.addMember(p);//Add pixel to region
+                                    this.pool.remove(p);//Remove added pixel
+                                }
                             }
                         }
-                    }
-                }//End neighbours
+                    }//End neighbours
 
-            }//End create
+                }//End create
 
-            this.regions_list.put(nbRegion, reg); //Add the region to the regions list
-            this.pool.remove(pix); //Remove the pixel from the pixels list
+                this.regions_list.put(nbRegion, reg); //Add the region to the regions list
+                this.pool.remove(pix); //Remove the pixel from the pixels list
+            }
+
+            System.out.println("Traitement regions terminé");
+
+            this.show();
         }
-
-        System.out.println("Traitement regions terminé");
-
-        this.show();
-    }
-
-    //--------------------------------------------------------------------------
-    //METHODS
-    //--------------------------------------------------------------------------
-    /**
-     * Show the final image
-     */
+        //--------------------------------------------------------------------------
+        //METHODS
+        //--------------------------------------------------------------------------
+        /**
+         * Show the final image
+         */
     public void show() {
         IplImage color = this.color();
         Mat img = new Mat(color);
@@ -140,6 +146,22 @@ public class RegionGrowing implements Runnable {
     protected double distRgb(CvScalar first, CvScalar second) {
         return Math.sqrt(Math.pow(first.red() - second.red(), 2) + Math.pow((first.green() - second.green()), 2) + Math.pow((first.blue() - second.blue()), 2));
 
+    }
+
+    /**
+     *
+     * @param first
+     * @param second
+     * @return
+     */
+    private double distHsv(CvScalar first, CvScalar second) {
+        double[] firstTab = {first.red(), first.green(), first.blue()};
+        double[] secondTab = {second.red(), second.green(), second.blue()};
+        double[] rgbToHsv1 = RgbToHsv.rgbToHsv(firstTab);
+        double[] rgbToHsv2 = RgbToHsv.rgbToHsv(secondTab);
+
+        
+        return RgbToHsv.distColors(rgbToHsv1, rgbToHsv2);
     }
 
     /**
