@@ -5,6 +5,8 @@
  */
 package segmentationtexture;
 
+import segmentation.RegionGrowing;
+
 /**
  *
  * @author cameron.mourot
@@ -16,9 +18,15 @@ public class SegmentationTexture {
      */
     public static void main(String[] args) {
         
-        String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\building.jpg";
+        String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\multiprise2.jpg";
+      //  String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage.jpg";
+      //  double gap = 150;
+
+        /*    RegionGrowing region = new RegionGrowing(pathimage,gap);
+        region.run(); */
+        
         Texture tex = new Texture(pathimage);
-        tex.run();
-       
+        tex.run(); 
+        
     }
 }
