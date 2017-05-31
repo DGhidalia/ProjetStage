@@ -29,6 +29,7 @@ public class RegionGrowing implements Runnable {
 
     private final double gap; //Gap for color distance
     private final String image_path;
+    private final String output_image;
     private final ArrayList<Pixel> pool; //List of pixels of the image
     private final HashMap<Integer, Region> regions_list; //List of regions of the image
     private final HashMap<Integer, Region> rejected_regions;//List of not taken regions
@@ -37,15 +38,20 @@ public class RegionGrowing implements Runnable {
     int TAILLE_REG_MIN;
 
     /**
-     * Initialize the properties using an image path
+     * Initialize the properties using an image path. Adjust the gap depending
+     * on the image. The higher it is, the less regions they are. Works with the
+     * invert.
      *
      * @param image_path
+     * @param output_image
      * @param gap distance between two colors to consider them as different
-     * colors
+     * colors.
+     * @param rgb true for RGB distance between pixels, false for HSV distance
      */
-    public RegionGrowing(String image_path, double gap, boolean rgb) {
+    public RegionGrowing(String image_path, String output_image, double gap, boolean rgb) {
         this.gap = gap;
         this.image_path = image_path;
+        this.output_image = output_image;
         this.pool = new ArrayList<>();
         this.regions_list = new HashMap<>();
         this.rejected_regions = new HashMap<>();
@@ -74,7 +80,7 @@ public class RegionGrowing implements Runnable {
             nbRegion++;
             Pixel pix = this.pool.get((int) (Math.random() * this.pool.size())); //Get random Pixel in pool
             Region reg = new Region();
-            reg.addMember(pix); //Add pixel to region
+            reg.addMember(pix); //Add pixel to region            
 
             //Create a region
             for (int i = 0; i < reg.size(); i++) {
@@ -104,11 +110,8 @@ public class RegionGrowing implements Runnable {
 
             }//End create            
 
-            if (reg.size() >= TAILLE_REG_MIN) {
-                this.regions_list.put(nbRegion, reg); //Add the region to the regions list                
-            } else {
-                this.rejected_regions.put(nbRegion, reg);
-            }
+            this.addToRegionList(reg, nbRegion);
+
             this.pool.remove(pix); //Remove the pixel from the pixels list
         }
 
@@ -125,11 +128,14 @@ public class RegionGrowing implements Runnable {
      */
     public void show() {
         System.out.println("Colorisation en cours");
+        //Create an image using the colorization algorithm
         IplImage color = this.color();
         Mat img = new Mat(color);
+        //Display the created image
         namedWindow("test", WINDOW_NORMAL);
         imshow("test", img);
-        imwrite("regionsResult.jpg", img);
+        //Save the image
+        imwrite(this.output_image, img);
         System.out.println("Colorisation terminée");
         waitKey(0);
     }
@@ -159,6 +165,8 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
+     * Gives the distance between two HSV pixels. Use the method cvGet2D() to
+     * get a Scalar from a pixel.
      *
      * @param first
      * @param second
@@ -167,10 +175,10 @@ public class RegionGrowing implements Runnable {
     private double distHsv(CvScalar first, CvScalar second) {
         double[] firstTab = {first.red(), first.green(), first.blue()};
         double[] secondTab = {second.red(), second.green(), second.blue()};
-        double[] rgbToHsv1 = RgbToHsv.rgbToHsv(firstTab);
-        double[] rgbToHsv2 = RgbToHsv.rgbToHsv(secondTab);
+        double[] firstHsv = RgbToHsv.rgbToHsv(firstTab);
+        double[] secondHsv = RgbToHsv.rgbToHsv(secondTab);
 
-        return RgbToHsv.distColors(rgbToHsv1, rgbToHsv2);
+        return RgbToHsv.distColors(firstHsv, secondHsv);
     }
 
     /**
@@ -189,7 +197,7 @@ public class RegionGrowing implements Runnable {
             int totRed = (int) (Math.random() * 255);
             int totGreen = (int) (Math.random() * 255);
             int totBlue = (int) (Math.random() * 255);
-            //Counter
+            //Calls a method to color a list of pixels
             List<Pixel> listPixel = r.getMembers();
             this.regionColor(totRed, totGreen, totBlue, listPixel, clone);
         });
@@ -222,6 +230,23 @@ public class RegionGrowing implements Runnable {
             index.put(pix.getY(), pix.getX(), 2, blue);
         }
         index.release();
+    }
+
+    /**
+     * Test in wich list the region has to be added. If the size of the region
+     * is too small, then it is added to a banlist. If the size is ok, it is
+     * added to the normal regions list.
+     *
+     * @param reg
+     * @param nbRegion
+     */
+    private void addToRegionList(Region reg, int nbRegion) {
+
+        if (reg.size() >= TAILLE_REG_MIN) {
+            this.regions_list.put(nbRegion, reg); //Add the region to the regions list                
+        } else {
+            this.rejected_regions.put(nbRegion, reg);
+        }
     }
 
     //--------------------------------------------------------------------------
