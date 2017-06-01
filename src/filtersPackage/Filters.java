@@ -52,7 +52,7 @@ public class Filters implements Runnable {
         //Display the obtained image with the Sobel filter
         namedWindow("Sobel Filter - Simple Edge Detector", WINDOW_NORMAL);
         imshow("Sobel Filter - Simple Edge Detector", sobelFltr);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\Sobel.jpg", sobelFltr);
+        imwrite("fusion\\Sobel.jpg", sobelFltr);
 
         //Call the method to apply Hough transform on the image given by the result of the Sobel filter
         houghTrs = this.getHoughPTransform(sobelFltr);
@@ -60,17 +60,17 @@ public class Filters implements Runnable {
         //Display the obtained image with the hough transform
         namedWindow("Hough Transform", WINDOW_NORMAL);
         imshow("Hough Transform", houghTrs);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\HoughTrs.jpg", houghTrs);
+        imwrite("fusion\\HoughTrs.jpg", houghTrs);
 
         imgPyramid = this.imagePyramid(src);
 
         //Display the obtained image with the pyramidal transformation to zoom down
         namedWindow("Pyramid Zoom Down", WINDOW_NORMAL);
         imshow("Pyramid Zoom Down", imgPyramid);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDown.jpg", imgPyramid);
+        imwrite("fusion\\PyramidDown.jpg", imgPyramid);
 
         //Get the Hough Image
-        Mat sobelRes = imread("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\Sobel.jpg");
+        Mat sobelRes = imread("fusion\\Sobel.jpg");
 
         //Realize the add of the source and hough image
         beta = (1.0 - alpha);
@@ -79,14 +79,14 @@ public class Filters implements Runnable {
         //Display the obtained image of the add of Source and Hough image
         namedWindow("Add Source and Hough", WINDOW_NORMAL);
         imshow("Add Source and Hough", addition);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage.jpg", addition);
+        imwrite("fusion\\AddImage.jpg", addition);
 
         imgPyramidAdd = this.imagePyramid(addition);
 
         //Display the obtained image with the pyramidal transformation to zoom down
         namedWindow("Pyramid Zoom Down Add", WINDOW_NORMAL);
         imshow("Pyramid Zoom Down Add", imgPyramidAdd);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDownAdd.jpg", imgPyramidAdd);
+        imwrite("fusion\\PyramidDownAdd.jpg", imgPyramidAdd);
 
         waitKey(0);
     }
@@ -99,7 +99,7 @@ public class Filters implements Runnable {
      */
     public Mat SobelFilter(Mat input) {
 
-        int scale = 2;
+        int scale = 1;
         int delta = 0;
         int ddepth = CV_16S;
 
@@ -149,7 +149,7 @@ public class Filters implements Runnable {
         CvMemStorage storage = cvCreateMemStorage(0); //A storage for various OpenCV dynamic data structures
         CvSeq lines; //Dynamic data structures
 
-        int thickness = 3; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
+        int thickness = 1; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
         int shift = 0; // Number of fractional bits in the coordinates of the center and in the radius value.
         double rho = 1; // Distance resolution in pixel-related units
         double theta = Math.PI / 180; // Angle resolution measured in radians
@@ -170,9 +170,9 @@ public class Filters implements Runnable {
             CvPoint pt2 = new CvPoint(line).position(1);
 
             //Display the coordonnates and the number of the line
-            System.out.println("- Line n° " + i);
-            System.out.println("\tp1: " + pt1);
-            System.out.println("\tp2: " + pt2 + "\n");
+//            System.out.println("- Line n° " + i);
+//            System.out.println("\tp1: " + pt1);
+//            System.out.println("\tp2: " + pt2 + "\n");
 
             //Line method, draw a line between point 1 and 2 
             cvLine(image, pt1, pt2, cvScalar(255, 255, 255, 255), thickness, CV_AA, shift); // Draws a line segment connecting two points
@@ -180,7 +180,7 @@ public class Filters implements Runnable {
 
         //Convert IplImage to Mat
         Mat hough = new Mat(image);
-
+        
         //Image with lines draw on it
         return hough;
     }
