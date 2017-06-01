@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package segmentationtexture;
+package filtersPackage;
 
 import org.bytedeco.javacpp.*;
 import static org.bytedeco.javacpp.opencv_core.CV_16S;
@@ -20,11 +20,11 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
  * @author cameron.mourot
  * @version 1.2
  */
-public class Texture implements Runnable {
+public class Filters implements Runnable {
 
     private final String pathimage;
 
-    public Texture(String pathimage) {
+    public Filters(String pathimage) {
         this.pathimage = pathimage;
     }
 

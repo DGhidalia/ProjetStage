@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package segmentationtexture;
+package filtersPackage;
 
 import segmentation.RegionGrowing;
 
@@ -11,7 +11,7 @@ import segmentation.RegionGrowing;
  *
  * @author cameron.mourot
  */
-public class SegmentationTexture {
+public class MainFilters {
 
     /**
      * @param args the command line arguments
@@ -25,8 +25,8 @@ public class SegmentationTexture {
         /*    RegionGrowing region = new RegionGrowing(pathimage,gap);
         region.run(); */
         
-        Texture tex = new Texture(pathimage);
-        tex.run(); 
+        Filters filt = new Filters(pathimage);
+        filt.run(); 
         
     }
 }
