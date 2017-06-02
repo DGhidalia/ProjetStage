@@ -17,32 +17,20 @@ import quadtree.Quadtree;
 
 /**
  *
- * @author pierre.renard
+ * @author david.ghidalia
  */
 public class main {
     
     public static void main(String[] args) throws IOException{        
-               
-        /*String pathconf = "test.txt";
-        String pathImage = "test_img.jpg";
+        opencv_core.Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier.png");
         
-        try {
-            Undistort und = new Undistort(pathImage, pathconf);
-            und.run();
-        } catch (IOException ex) {
-            Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-        opencv_core.Mat img = imread("C:\\Users\\david.ghidalia\\Documents\\NetBeansProjects\\ProjetStage\\test\\ressource\\testDamier2.jpg");
+//        Node instance = new Node(new opencv_core.Rect(0,0,img.size().width(),img.size().height()),img,img.clone());
         
-        Node instance = new Node(new opencv_core.Rect(0,0,img.size().width(),img.size().height()),img);
+        Quadtree s = new Quadtree(img);
         
-        Quadtree s = new Quadtree(instance);
+        s.run();
         
-        s.Segmentate();
-        
-        //s.run(imread("C:\\Users\\david.ghidalia\\Documents\\PROJETJAVA\\result\\undistorted_perspective.jpg"));
-        
-        waitKey(0);
+        //waitKey(0);
     }
     
     
