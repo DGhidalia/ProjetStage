@@ -24,6 +24,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 /**
  *
  * @author pierre.renard
+ * @version 1.3
  */
 public class RegionGrowing implements Runnable {
 
@@ -182,28 +183,32 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
-     * Color the image depending on the regions
+     * Color the regions of the source image
      *
      * @return
      */
     private IplImage color() {
 
         IplImage clone = this.ipl.clone();
-        Collection<Region> values = this.regions_list.values();
-        Collection<Region> dark = this.rejected_regions.values();
-
-        values.forEach((r) -> {
-            //Total value of each color for each region
-            int totRed = (int) (Math.random() * 255);
-            int totGreen = (int) (Math.random() * 255);
-            int totBlue = (int) (Math.random() * 255);
-            //Calls a method to color a list of pixels
-            List<Pixel> listPixel = r.getMembers();
-            this.regionColor(totRed, totGreen, totBlue, listPixel, clone);
+        Collection<Region> regionValues = this.regions_list.values();
+        Collection<Region> rejectedRegionsValues = this.rejected_regions.values();
+        
+        //Foreach loop 
+        regionValues.forEach((region) -> {
+            //Random values of each color for each region
+            int redValue = (int) (Math.random() * 255);
+            int greenValue = (int) (Math.random() * 255);
+            int blueValue = (int) (Math.random() * 255);
+            //Create a list of pixels (region)
+            List<Pixel> listPixel = region.getMembers();
+            //Calls a method to color a list of pixels (region)
+            this.regionColor(redValue, greenValue, blueValue, listPixel, clone);
         });
 
-        dark.forEach((r) -> {
-            List<Pixel> listPixel = r.getMembers();
+        rejectedRegionsValues.forEach((region) -> {
+            //Create a list of pixels (region)
+            List<Pixel> listPixel = region.getMembers();
+            //Calls a method to color a list of pixels (region)
             this.regionColor(0, 0, 0, listPixel, clone);
         });
 
@@ -215,13 +220,16 @@ public class RegionGrowing implements Runnable {
      * Color all the pixels of a region with the average color of all those
      * pixels. Sub function only used with the global coloring function.
      *
-     * @param red
-     * @param green
-     * @param blue
-     * @param index
+     * @param red Amount of red in the region
+     * @param green Amount of green in the region
+     * @param blue Amount of blue in the region
+     * @param listPixel Represents the region
+     * @param clone Clone of the basic image
      */
     private void regionColor(int red, int green, int blue, List<Pixel> listPixel, IplImage clone) {
+        //Create an indexer for the image
         UByteIndexer index = clone.createIndexer();
+        //Apply colorization on each pixel of the list
         for (int i = 0; i < listPixel.size(); i++) {
             Pixel pix = listPixel.get(i);
 
@@ -229,7 +237,8 @@ public class RegionGrowing implements Runnable {
             index.put(pix.getY(), pix.getX(), 1, green);
             index.put(pix.getY(), pix.getX(), 2, blue);
         }
-        index.release();
+        
+        index.release(); //Memory release
     }
 
     /**

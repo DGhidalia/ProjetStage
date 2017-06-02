@@ -1,0 +1,21 @@
+// IMPORTANT : CHANGE ONLY THE DATA ! //
+// DO NOT CHANGE THE ORDER OF THE DATA OR REMOVE THE COMMENT LINE //
+
+#Polynomial coefficients for the mapping function
+-1972.326 0 0.0001973804 -2.340513e-08 1.201796e-11
+#Polynomial coefficients for the inverse mapping function
+2919.084724 1668.238027 -11.420681 262.954796 190.526822 225.715277 422.479651 370.701789 145.482053 21.370168
+#Center of the columns
+1718.9991
+#Center of the rows 
+2267.7433
+#Affine parameter c
+1.000006
+#Affine parameter d
+2.7e-05
+#Affine parameter e
+2.4e-05
+#Image height
+3448 
+#Image width
+4592

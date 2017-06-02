@@ -12,6 +12,7 @@ import java.util.List;
  * This class represents a region of pixels of an image. 
  *
  * @author pierre.renard
+ * @version 1.0
  */
 class Region {
 

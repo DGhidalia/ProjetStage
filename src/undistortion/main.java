@@ -31,7 +31,9 @@ public class main {
         
         String img_path = "testSobelMulti.jpg";       
         
-        String outputImg = "test_rg\\multi_result7.jpg";
+        String outputImg = "test_rg\\multi_result8.jpg";
+        
+        String outputFile = "\\fusion";
                         
         //RegionGrowing rg = new RegionGrowing(img_path,outputImg,6.5 ,true);
         
@@ -40,7 +42,7 @@ public class main {
 //        rg.run();
         
         
-        Filters f = new Filters(outputImg);
+        Filters f = new Filters(outputImg, outputFile);
         
         f.run();
         
