@@ -5,9 +5,6 @@
  */
 package filtersPackage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import org.bytedeco.javacpp.*;
 import static org.bytedeco.javacpp.opencv_core.CV_16S;
 import static org.bytedeco.javacpp.opencv_core.*;
@@ -26,19 +23,9 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
 public class Filters implements Runnable {
 
     private final String pathimage;
-    private final List<Line> line_list;
-    private String outputFile;
 
     public Filters(String pathimage) {
         this.pathimage = pathimage;
-        this.line_list = new ArrayList<>();
-        this.outputFile = "";
-    }
-
-    public Filters(String pathimage, String outputFile) {
-        this.pathimage = pathimage;
-        this.line_list = new ArrayList<>();
-        this.outputFile = outputFile;
     }
 
     /**
@@ -65,7 +52,7 @@ public class Filters implements Runnable {
         //Display the obtained image with the Sobel filter
         namedWindow("Sobel Filter - Simple Edge Detector", WINDOW_NORMAL);
         imshow("Sobel Filter - Simple Edge Detector", sobelFltr);
-        imwrite(this.outputFile + "\\Sobel.jpg", sobelFltr);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\Sobel.jpg", sobelFltr);
 
         //Call the method to apply Hough transform on the image given by the result of the Sobel filter
         houghTrs = this.getHoughPTransform(sobelFltr);
@@ -73,17 +60,17 @@ public class Filters implements Runnable {
         //Display the obtained image with the hough transform
         namedWindow("Hough Transform", WINDOW_NORMAL);
         imshow("Hough Transform", houghTrs);
-        imwrite(this.outputFile + "\\HoughTrs.jpg", houghTrs);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\HoughTrs.jpg", houghTrs);
 
         imgPyramid = this.imagePyramid(src);
 
         //Display the obtained image with the pyramidal transformation to zoom down
         namedWindow("Pyramid Zoom Down", WINDOW_NORMAL);
         imshow("Pyramid Zoom Down", imgPyramid);
-        imwrite(this.outputFile + "\\PyramidDown.jpg", imgPyramid);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDown.jpg", imgPyramid);
 
         //Get the Hough Image
-        Mat sobelRes = imread("fusion\\Sobel.jpg");
+        Mat sobelRes = imread("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\Sobel.jpg");
 
         //Realize the add of the source and hough image
         beta = (1.0 - alpha);
@@ -92,14 +79,14 @@ public class Filters implements Runnable {
         //Display the obtained image of the add of Source and Hough image
         namedWindow("Add Source and Hough", WINDOW_NORMAL);
         imshow("Add Source and Hough", addition);
-        imwrite(this.outputFile + "\\AddImage.jpg", addition);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage.jpg", addition);
 
         imgPyramidAdd = this.imagePyramid(addition);
 
         //Display the obtained image with the pyramidal transformation to zoom down
         namedWindow("Pyramid Zoom Down Add", WINDOW_NORMAL);
         imshow("Pyramid Zoom Down Add", imgPyramidAdd);
-        imwrite(this.outputFile + "\\PyramidDownAdd.jpg", imgPyramidAdd);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDownAdd.jpg", imgPyramidAdd);
 
         waitKey(0);
     }
@@ -112,7 +99,7 @@ public class Filters implements Runnable {
      */
     public Mat SobelFilter(Mat input) {
 
-        int scale = 1;
+        int scale = 2;
         int delta = 0;
         int ddepth = CV_16S;
 
@@ -162,12 +149,11 @@ public class Filters implements Runnable {
         CvMemStorage storage = cvCreateMemStorage(0); //A storage for various OpenCV dynamic data structures
         CvSeq lines; //Dynamic data structures
 
-        int thickness = 1; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
+        int thickness = 3; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
         int shift = 0; // Number of fractional bits in the coordinates of the center and in the radius value.
         double rho = 1; // Distance resolution in pixel-related units
         double theta = Math.PI / 180; // Angle resolution measured in radians
         int threshold = 60; // Threshold parameter. A line is returned by the function if the corresponding accumulator value is greater than threshold
-        ArrayList<Line> tempList = new ArrayList<>();
 
         //Probabilistic Hough transform returns line segments rather than the whole lines.
         //Every segment is represented by starting and ending points 
@@ -176,6 +162,7 @@ public class Filters implements Runnable {
         //Color image in black to only have the lines visible
         cvSet(image, CV_RGB(0, 0, 0));
 
+        //IplImage avec image noir sur laquelle les lignes seront tracées.
         //For each line, get the coordonnates of the point 1 and 2
         for (int i = 0; i < lines.total(); i++) {
             Pointer line = cvGetSeqElem(lines, i);
@@ -183,18 +170,13 @@ public class Filters implements Runnable {
             CvPoint pt2 = new CvPoint(line).position(1);
 
             //Display the coordonnates and the number of the line
-            //System.out.println("- Line n° " + i);
-            //System.out.println("\tp1: " + pt1);
-            //System.out.println("\tp2: " + pt2 + "\n");
-            Line lineObject = new Line(pt1, pt2);
-            tempList.add(i, lineObject);
+            System.out.println("- Line n° " + i);
+            System.out.println("\tp1: " + pt1);
+            System.out.println("\tp2: " + pt2 + "\n");
+
+            //Line method, draw a line between point 1 and 2 
+            cvLine(image, pt1, pt2, cvScalar(255, 255, 255, 255), thickness, CV_AA, shift); // Draws a line segment connecting two points
         }
-
-        //Test the lines neighbours
-        this.testNeighbours(tempList);
-
-        //Draw the lines on the image
-        this.drawLines(image, thickness, shift);
 
         //Convert IplImage to Mat
         Mat hough = new Mat(image);
@@ -228,78 +210,5 @@ public class Filters implements Runnable {
         //   pyrDown(output2, temp3, new opencv_core.Size(output2.cols() / 2, output2.rows() / 2), BORDER_DEFAULT);
         // Return the image divided by four thanks to the pyrDown method
         return temp;
-    }
-
-    /**
-     * Test distance between every line of the list of lines to reduce their
-     * number if they are too close to each other
-     *
-     * @param list
-     */
-    private void testNeighbours(ArrayList<Line> list) {
-
-        //Test a principal line's neighbours 
-        for (int i = 0; i < list.size(); i++) {
-
-            //Add the line to the final list
-            Line line1 = list.get(i);
-            this.line_list.add(line1);
-
-            //Test every neighbours
-            for (int j = 0; j < list.size(); j++) {
-
-                //Test if the tested line is not the current main line
-                if (!list.get(j).equals(list.get(i))) {
-                    Line line2 = list.get(j);
-                    //Distance gap
-                    int gap = 0;
-                    //Test of the distance between the two lines
-                    if (distancePoints(line1.getPt1(), line2.getPt1()) >= gap && distancePoints(line1.getPt2(), line2.getPt2()) >= gap) {
-                        //If its far, add it to the final list
-                        this.line_list.add(line2);
-
-                    } else {
-                        list.remove(j);
-                    }
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Gives the distance between two points of the image. Used to calculate
-     * distance between two lines
-     *
-     * @param pt1
-     * @param pt2
-     * @return
-     */
-    private double distancePoints(CvPoint pt1, CvPoint pt2) {
-
-        double x = Math.pow(pt1.x() - pt2.x(), 2);
-        double y = Math.pow(pt1.y() - pt2.y(), 2);
-
-        return Math.sqrt(x + y);
-    }
-
-    /**
-     * Draw the lines for the Hough Transform using the lines list
-     *
-     * @param image
-     * @param thickness
-     * @param shift
-     */
-    private void drawLines(IplImage image, int thickness, int shift) {
-
-        for (int i = 0; i < this.line_list.size(); i++) {
-
-            CvPoint pt1 = this.line_list.get(i).getPt1();
-            CvPoint pt2 = this.line_list.get(i).getPt2();
-
-            //Line method, draw a line between point 1 and 2 
-            cvLine(image, pt1, pt2, cvScalar(255, 255, 255, 255), thickness, CV_AA, shift); // Draws a line segment connecting two points
-        }
-
     }
 }

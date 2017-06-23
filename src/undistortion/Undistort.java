@@ -31,10 +31,10 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvRemap;
  *
  * @author jean-jacques
  */
-public class Undistort {
+public class Undistort implements Runnable{
 
-    private String pathimage;
-    private Cam2World model;
+    private final String pathimage;
+    private final Cam2World model;
     private final float SF = 3;     // Zoom factor 
 
     //-------------------------------------------------------------------------
@@ -56,6 +56,7 @@ public class Undistort {
      * Show the result in a window and save the undistorded 
      * 
      */
+    @Override
     public void run() {
 
         opencv_core.IplImage src1 = opencv_imgcodecs.cvLoadImage(this.pathimage);      // create an image object

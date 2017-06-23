@@ -133,12 +133,12 @@ public class RegionGrowing implements Runnable {
         IplImage color = this.color();
         Mat img = new Mat(color);
         //Display the created image
-        namedWindow("test", WINDOW_NORMAL);
-        imshow("test", img);
+        //namedWindow("test", WINDOW_NORMAL);
+        //imshow("test", img);
         //Save the image
         imwrite(this.output_image, img);
         System.out.println("Colorisation terminée");
-        waitKey(0);
+        //waitKey(0);
     }
 
     /**
@@ -161,7 +161,12 @@ public class RegionGrowing implements Runnable {
      * @return
      */
     protected double distRgb(CvScalar first, CvScalar second) {
-        return Math.sqrt(Math.pow(first.red() - second.red(), 2) + Math.pow((first.green() - second.green()), 2) + Math.pow((first.blue() - second.blue()), 2));
+        
+        double red = Math.pow(first.red() - second.red(), 2);
+        double green = Math.pow((first.green() - second.green()), 2);
+        double blue = Math.pow((first.blue() - second.blue()), 2);
+        
+        return Math.sqrt(red + green + blue);
 
     }
 

@@ -29,22 +29,25 @@ public class main {
             Logger.getLogger(Undistort.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
-        String img_path = "testSobelMulti.jpg";       
+        String img_path = "C:\\Users\\pierre.renard\\Documents\\!TEST_TPS_EXEC\\600_600.jpg";       
         
-        String outputImg = "test_rg\\multi_result8.jpg";
-        
-        String outputFile = "\\fusion";
-                        
-        //RegionGrowing rg = new RegionGrowing(img_path,outputImg,6.5 ,true);
-        
-//        RegionGrowing rg = new RegionGrowing(img_path, outputImg,7 ,true);
-//        
-//        rg.run();
+        String outputImg = "C:\\Users\\pierre.renard\\Documents\\!TEST_TPS_EXEC\\Results\\600_600_R.jpg";
         
         
-        Filters f = new Filters(outputImg, outputFile);
         
-        f.run();
+        RegionGrowing rg = new RegionGrowing(img_path, outputImg, 8 ,true);
+        
+        rg.run();
+        
+        
+        
+        
+        
+        //String outputFile = "fusion_2\\";
+        
+        /*Filters f = new Filters(img_path, outputFile);
+        
+        f.run();*/
         
         
         
