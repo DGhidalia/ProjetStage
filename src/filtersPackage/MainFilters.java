@@ -19,13 +19,14 @@ public class MainFilters {
     public static void main(String[] args) {
         
         String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\multiprise2.jpg";
+        int divide =0;
       //  String pathimage = "C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage.jpg";
       //  double gap = 150;
 
         /*    RegionGrowing region = new RegionGrowing(pathimage,gap);
         region.run(); */
         
-        Filters filt = new Filters(pathimage);
+        Filters filt = new Filters(pathimage,divide);
         filt.run(); 
         
     }

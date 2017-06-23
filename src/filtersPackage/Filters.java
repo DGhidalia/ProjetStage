@@ -5,6 +5,7 @@
  */
 package filtersPackage;
 
+import java.util.Scanner;
 import org.bytedeco.javacpp.*;
 import static org.bytedeco.javacpp.opencv_core.CV_16S;
 import static org.bytedeco.javacpp.opencv_core.*;
@@ -18,14 +19,16 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
  * reduce the size of the image to apply the region growing easily.
  *
  * @author cameron.mourot
- * @version 1.2
+ * @version 1.3
  */
 public class Filters implements Runnable {
 
     private final String pathimage;
+    private final int divide;
 
-    public Filters(String pathimage) {
+    public Filters(String pathimage, int divide) {
         this.pathimage = pathimage;
+        this.divide = divide;
     }
 
     /**
@@ -40,7 +43,8 @@ public class Filters implements Runnable {
         Mat src = imread(this.pathimage); // Retrieves the image from the given path
         Mat sobelFltr, houghTrs, imgPyramid, imgPyramidAdd; // Create matrix
         Mat addition = new Mat();
-        double alpha = 0.5, beta;
+        double alpha = 0.5;
+        double beta;
 
         //Display the source image  
         namedWindow("Undistorted image", WINDOW_NORMAL);
@@ -61,7 +65,7 @@ public class Filters implements Runnable {
         namedWindow("Hough Transform", WINDOW_NORMAL);
         imshow("Hough Transform", houghTrs);
         imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\HoughTrs.jpg", houghTrs);
-
+        
         imgPyramid = this.imagePyramid(src);
 
         //Display the obtained image with the pyramidal transformation to zoom down
@@ -71,7 +75,7 @@ public class Filters implements Runnable {
 
         //Get the Hough Image
         Mat sobelRes = imread("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\Sobel.jpg");
-
+        
         //Realize the add of the source and hough image
         beta = (1.0 - alpha);
         addWeighted(src, alpha, sobelRes, beta, 0.0, addition);
@@ -79,14 +83,16 @@ public class Filters implements Runnable {
         //Display the obtained image of the add of Source and Hough image
         namedWindow("Add Source and Hough", WINDOW_NORMAL);
         imshow("Add Source and Hough", addition);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage.jpg", addition);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\AddImage2.jpg", addition);
+
+        
 
         imgPyramidAdd = this.imagePyramid(addition);
-
+        
         //Display the obtained image with the pyramidal transformation to zoom down
         namedWindow("Pyramid Zoom Down Add", WINDOW_NORMAL);
         imshow("Pyramid Zoom Down Add", imgPyramidAdd);
-        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDownAdd.jpg", imgPyramidAdd);
+        imwrite("C:\\Users\\cameron.mourot\\Documents\\GitHub\\ProjetStage\\results\\PyramidDownAdd2.jpg", imgPyramidAdd);
 
         waitKey(0);
     }
@@ -99,7 +105,7 @@ public class Filters implements Runnable {
      */
     public Mat SobelFilter(Mat input) {
 
-        int scale = 2;
+        int scale = 1;
         int delta = 0;
         int ddepth = CV_16S;
 
@@ -117,7 +123,7 @@ public class Filters implements Runnable {
 
         /// Convert it to gray
         cvtColor(input, srcgray, CV_BGR2GRAY);
-
+ 
         /// Gradient X - Detect vertical edges
         Sobel(srcgray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT);
         convertScaleAbs(grad_x, abs_grad_x);
@@ -125,17 +131,18 @@ public class Filters implements Runnable {
         /// Gradient Y - Detect horizontal edges
         Sobel(srcgray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT);
         convertScaleAbs(grad_y, abs_grad_y);
-
+        
         /// Total Gradient (approximate)
         addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
 
         // Convert to threshold zero image
-        // threshold(grad, result, 40.0, 255.0, THRESH_TOZERO);
-        threshold(grad, result, 40.0, 255.0, THRESH_TOZERO);
+        threshold(grad, result, 30.0, 255.0, THRESH_TOZERO);
+        //threshold(grad, result, 40.0, 255.0, THRESH_BINARY);
 
         // Return the image processed by the Sobel Filter
         return result;
     }
+    
 
     /**
      *
@@ -149,7 +156,7 @@ public class Filters implements Runnable {
         CvMemStorage storage = cvCreateMemStorage(0); //A storage for various OpenCV dynamic data structures
         CvSeq lines; //Dynamic data structures
 
-        int thickness = 3; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
+        int thickness = 2; // Thickness of the circle outline, if positive. Negative thickness means that a filled circle is to be drawn.
         int shift = 0; // Number of fractional bits in the coordinates of the center and in the radius value.
         double rho = 1; // Distance resolution in pixel-related units
         double theta = Math.PI / 180; // Angle resolution measured in radians
@@ -184,6 +191,24 @@ public class Filters implements Runnable {
         //Image with lines draw on it
         return hough;
     }
+    
+    /**
+     *
+     * @param input
+     * @return The image processed by Canny detector
+     * @since 1.3 Apply the Canny edge detection on the image
+     */
+    /*   public Mat cannyDetection(Mat input) {
+        
+        Mat result = null;
+        cvtColor(input, input, CV_RGB2GRAY); 
+        GaussianBlur(input, input, new opencv_core.Size(3, 3), 4);   
+        threshold(input, result, 65.0, 255.0, THRESH_BINARY);
+
+        Canny( input, input, input, 300, 3 );  
+
+        return input;
+    } */
 
     /**
      *
@@ -193,22 +218,16 @@ public class Filters implements Runnable {
      */
     public Mat imagePyramid(Mat input) {
 
-        Mat temp = new Mat(); // Matrix initialisation
+        Mat temp = input.clone(); // Matrix initialisation
+        Mat temp2 = new Mat(); // Matrix initialisation
         Mat output = new Mat();
-        Mat temp2 = new Mat();
-        Mat output2 = new Mat();
-        Mat temp3 = new Mat();
-        Mat output3 = new Mat();
-
-        // First use of pyrDown, it will divide by two the size of the input image
-        pyrDown(input, temp, new opencv_core.Size(input.cols() / 2, input.rows() / 2), BORDER_DEFAULT);
-
-        // Second use of pyrDown, it will divide by two the size of the temporary image
-        //   pyrDown(temp, output, new opencv_core.Size(temp.cols() / 2, temp.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(output, temp2, new opencv_core.Size(output.cols() / 2, output.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(temp2, output2, new opencv_core.Size(temp2.cols() / 2, temp2.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(output2, temp3, new opencv_core.Size(output2.cols() / 2, output2.rows() / 2), BORDER_DEFAULT);
-        // Return the image divided by four thanks to the pyrDown method
-        return temp;
+  
+        for (int i = 0; i < this.divide; i++) {
+            pyrDown(temp, temp2, new opencv_core.Size(temp.cols() / 2, temp.rows() / 2), BORDER_DEFAULT);
+            temp = temp2;
+        }
+        
+        output = temp;
+        return output;
     }
 }
