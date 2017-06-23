@@ -23,9 +23,11 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
 public class Filters implements Runnable {
 
     private final String pathimage;
+    private final int divide;
 
-    public Filters(String pathimage) {
+    public Filters(String pathimage, int divide) {
         this.pathimage = pathimage;
+        this.divide = divide;
     }
 
     /**
@@ -193,22 +195,16 @@ public class Filters implements Runnable {
      */
     public Mat imagePyramid(Mat input) {
 
-        Mat temp = new Mat(); // Matrix initialisation
+        Mat temp = input.clone(); // Matrix initialisation
+        Mat temp2 = new Mat(); // Matrix initialisation
         Mat output = new Mat();
-        Mat temp2 = new Mat();
-        Mat output2 = new Mat();
-        Mat temp3 = new Mat();
-        Mat output3 = new Mat();
-
-        // First use of pyrDown, it will divide by two the size of the input image
-        pyrDown(input, temp, new opencv_core.Size(input.cols() / 2, input.rows() / 2), BORDER_DEFAULT);
-
-        // Second use of pyrDown, it will divide by two the size of the temporary image
-        //   pyrDown(temp, output, new opencv_core.Size(temp.cols() / 2, temp.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(output, temp2, new opencv_core.Size(output.cols() / 2, output.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(temp2, output2, new opencv_core.Size(temp2.cols() / 2, temp2.rows() / 2), BORDER_DEFAULT);
-        //   pyrDown(output2, temp3, new opencv_core.Size(output2.cols() / 2, output2.rows() / 2), BORDER_DEFAULT);
-        // Return the image divided by four thanks to the pyrDown method
-        return temp;
+  
+        for (int i = 0; i < this.divide; i++) {
+            pyrDown(temp, temp2, new opencv_core.Size(temp.cols() / 2, temp.rows() / 2), BORDER_DEFAULT);
+            temp = temp2;
+        }
+        
+        output = temp;
+        return output;
     }
 }
