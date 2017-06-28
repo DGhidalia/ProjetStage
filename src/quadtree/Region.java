@@ -14,19 +14,14 @@ import java.util.List;
  * @author pierre.renard
  */
 class Region {
-    
-    private List<Node> _noeudRegion;
 
     private List<Pixel> members; //Pixels of the region
-    
-    private Pixel _pointCentre;
 
     private int id;
 
     public Region(int id) {
         this.id = id;
         this.members = new ArrayList<>();
-        this._noeudRegion = new ArrayList<>();
     }
 
     @Override
@@ -84,33 +79,4 @@ class Region {
     public int size() {
         return members.size();
     }
-
-    /**
-     * @return the _noeudRegion
-     */
-    public List<Node> getNoeudRegion() {
-        return _noeudRegion;
-    }
-
-    /**
-     * @param _noeudRegion the _noeudRegion to set
-     */
-    public void setNoeudRegion(List<Node> _noeudRegion) {
-        this._noeudRegion = _noeudRegion;
-    }
-
-    /**
-     * @return the _pointCentre
-     */
-    public Pixel getPointCentre() {
-        return _pointCentre;
-    }
-
-    /**
-     * @param _pointCentre the _pointCentre to set
-     */
-    public void setPointCentre(Pixel _pointCentre) {
-        this._pointCentre = _pointCentre;
-    }
-
 }
