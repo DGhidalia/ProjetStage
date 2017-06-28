@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class represents a region of pixels of an image. 
+ * This class represents a region of pixels of an image.
  *
  * @author pierre.renard
  * @version 1.0
@@ -26,7 +26,7 @@ class Region {
     }
 
     /**
-     * Add a Pixel to the region
+     * Add a Pixel to the pixels list of the region
      *
      * @param member
      */
@@ -41,6 +41,7 @@ class Region {
     //GETTERS
     //--------------------------------------------------------------------------
     /**
+     * Get the list of pixels of the region
      *
      * @return
      */

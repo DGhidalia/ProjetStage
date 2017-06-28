@@ -9,7 +9,7 @@ package segmentation;
  * This class represents a pixel, by his coordinates, from an image.
  *
  * @author pierre.renard
- * @version 1.0
+ * @version 1.1
  */
 public class Pixel {
 
@@ -30,22 +30,27 @@ public class Pixel {
     }
 
     /**
-     * @return the X
+     * Get the X coordinate of the pixel
+     *
+     * @return
      */
     public int getX() {
         return X;
     }
 
     /**
-     * @return the Y
+     * Get the Y coordinate of the pixel
+     *
+     * @return
      */
     public int getY() {
         return Y;
     }
 
     /**
-     * 
-     * @return 
+     * Get the hash code of the pixel
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -56,9 +61,10 @@ public class Pixel {
     }
 
     /**
-     * 
+     * Compare this object with another one
+     *
      * @param obj
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object obj) {
@@ -82,8 +88,9 @@ public class Pixel {
     }
 
     /**
-     * 
-     * @return 
+     * Give the informations about the pixel
+     *
+     * @return
      */
     @Override
     public String toString() {

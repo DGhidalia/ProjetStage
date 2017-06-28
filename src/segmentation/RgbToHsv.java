@@ -11,13 +11,25 @@ package segmentation;
  */
 public class RgbToHsv {
 
+    /**
+     * Convert a RGB pixel as a table to a HSV pixel
+     *
+     * @param rgb
+     * @return
+     */
     public static double[] rgbToHsv(double[] rgb) {
+
+        //Result pixel
+        double[] res = new double[3];
+        
+        //Check the pixel RGB value 
         if (rgb.length == 3 && rgb[1] <= 255 && 0 <= rgb[1] && 0 <= rgb[2] && rgb[2] <= 255 && 0 <= rgb[0] && rgb[0] <= 255) {
-            double[] res = new double[3];
+
             double R = rgb[0] / 255;
             double G = rgb[1] / 255;
             double B = rgb[2] / 255;
-
+            
+            //Check the max and min between Green and Blue values
             double Cmax = Math.max(R, Math.max(G, B));
             double Cmin = Math.min(R, Math.min(G, B));
 
@@ -25,6 +37,7 @@ public class RgbToHsv {
 
             double H = 0, S, V;
 
+            //Affect a value to the Hue depending on the CMax value calculated above
             if (delta == 0) {
                 H = 0;
             } else if (Cmax == R) {
@@ -40,32 +53,39 @@ public class RgbToHsv {
                 H += 360;
             }
 
+            //Affect a value to the Saturation depending on the CMax value calculated above
             if (Cmax == 0) {
                 S = 0;
             } else {
                 S = (delta / Cmax);
             }
 
+            //Affect CMax value to the Value
             V = Cmax;
 
+            //Create the HSV pixel table
             res[0] = H;
             res[1] = S;
             res[2] = V;
 
-            return res;
         } else {
-            return null;
+            res = null;
         }
+
+        return res;
     }
 
+    /**
+     * Distance between two pixels
+     *
+     * @param a
+     * @param b
+     * @return
+     */
     public static double distColors(double[] a, double[] b) {
         return Math.pow(Math.sin((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.sin((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
                 + Math.pow(Math.cos((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.cos((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
                 + Math.pow(a[2] - b[2], 2);
-   //return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2)+Math.pow(a[2]-b[2],2));
-//           (a[0]) / 180) * a[1] * a[2] - Math.sin((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
-//                + Math.pow(Math.cos((a[0] * Math.PI) / 180) * a[1] * a[2] - Math.cos((b[0] * Math.PI) / 180) * b[1] * b[2], 2)
-//                + Math.pow(a[2] - b[2], 2);
     }
 
 }

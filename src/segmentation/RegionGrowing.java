@@ -125,24 +125,24 @@ public class RegionGrowing implements Runnable {
     //--------------------------------------------------------------------------
 
     /**
-     * Show the final image
+     * Show the final image and save it
      */
     public void show() {
         System.out.println("Colorisation en cours");
         //Create an image using the colorization algorithm
         IplImage color = this.color();
         Mat img = new Mat(color);
-        //Display the created image
-        //namedWindow("test", WINDOW_NORMAL);
-        //imshow("test", img);
-        //Save the image
+        //Display the created image in a window
+        namedWindow("test", WINDOW_NORMAL);
+        imshow("test", img);
+        //Save the image file
         imwrite(this.output_image, img);
         System.out.println("Colorisation terminée");
-        //waitKey(0);
+        waitKey(0);
     }
 
     /**
-     * Create the pool of pixels from the image
+     * Scan the image and add every pixel to the pool list
      */
     private void fillPool() {
         for (int x = 0; x < this.ipl.width(); x++) {
@@ -161,11 +161,11 @@ public class RegionGrowing implements Runnable {
      * @return
      */
     protected double distRgb(CvScalar first, CvScalar second) {
-        
+
         double red = Math.pow(first.red() - second.red(), 2);
         double green = Math.pow((first.green() - second.green()), 2);
         double blue = Math.pow((first.blue() - second.blue()), 2);
-        
+
         return Math.sqrt(red + green + blue);
 
     }
@@ -188,7 +188,8 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
-     * Color the regions of the source image
+     * Color the regions of the source image. Give a random color to retained
+     * regions and black color to rejected regions.
      *
      * @return
      */
@@ -197,7 +198,7 @@ public class RegionGrowing implements Runnable {
         IplImage clone = this.ipl.clone();
         Collection<Region> regionValues = this.regions_list.values();
         Collection<Region> rejectedRegionsValues = this.rejected_regions.values();
-        
+
         //Foreach loop 
         regionValues.forEach((region) -> {
             //Random values of each color for each region
@@ -242,7 +243,7 @@ public class RegionGrowing implements Runnable {
             index.put(pix.getY(), pix.getX(), 1, green);
             index.put(pix.getY(), pix.getX(), 2, blue);
         }
-        
+
         index.release(); //Memory release
     }
 
@@ -267,6 +268,7 @@ public class RegionGrowing implements Runnable {
     //GETTERS
     //--------------------------------------------------------------------------
     /**
+     * Get the path of the image
      *
      * @return
      */
@@ -275,6 +277,7 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
+     * Get the list of pixels of the image
      *
      * @return
      */
@@ -283,6 +286,7 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
+     * Get the list of created regions
      *
      * @return
      */
@@ -291,6 +295,7 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
+     * Get the color gap used for distance calculation
      *
      * @return
      */
@@ -299,6 +304,7 @@ public class RegionGrowing implements Runnable {
     }
 
     /**
+     * Get the treated image
      *
      * @return
      */
