@@ -19,6 +19,10 @@ class Region {
 
     private int id;
 
+    public int getId() {
+        return id;
+    }
+
     public Region(int id) {
         this.id = id;
         this.members = new ArrayList<>();
@@ -61,9 +65,9 @@ class Region {
     }
 
     /**
-     * Merge two Region
+     * merge two Region
      */
-    public void Merge(Region r){
+    public void merge(Region r){
          for(Pixel p : r.getMembers())
              this.addMember(p);
     }

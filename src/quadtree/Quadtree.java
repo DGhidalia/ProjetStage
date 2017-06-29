@@ -31,7 +31,7 @@ public class Quadtree implements Runnable {
 
     private Node _root;
 
-    private ArrayList<Region> regions_list;
+    private List<Region> regions_list;
 
     private IplImage ipl;
 
@@ -75,30 +75,6 @@ public class Quadtree implements Runnable {
             }
             pile.remove(current);
         }
-
-//        ArrayList<Node> FinalNode = this.getFinalNode();
-//        System.out.println("Début mise en place régions");
-//        
-//        int cpt = 0;
-//        for(Node n : FinalNode){
-//            Region r = new Region(cpt);
-//            int _x = n.getROI().x();
-//            int _y = n.getROI().y();
-//            for(int x = n.getROI().x(); x< _x + n.getROI().width();x++){
-//                for(int y = n.getROI().y(); y < _y + n.getROI().height();y++){
-//                    r.addMember(new Pixel(x,y));
-//                }
-//            }
-//            Pixel centre = new Pixel(n.getROI().x() + (n.getROI().width()/2),n.getROI().y() + (n.getROI().height()/2));
-//            r.setPointCentre(centre);
-//            r.getNoeudRegion().add(n);
-//            this.regions_list.add(r);
-//            cpt++;
-//        }
-    }
-
-    public double distColorsRGB(double[] a, double[] b) {
-        return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
 
     /**
@@ -149,51 +125,40 @@ public class Quadtree implements Runnable {
         }
         index.release();
     }
-
-    /*public ArrayList<Node> fusion(Node node) {
-        //si  il a des fils et si ces fils ne sont pas fusioner.
-        boolean son = node.hasSon();
-        ArrayList<Node> supernodes = new ArrayList<>();
-        if (son) {
-            ArrayList<Node> fils = node.getFils();
-            //fusion des fils des fils
-            for (Node fil : fils) {
-                if (!fil.isMerged()) {
-                    supernodes.addAll(fusion(fil));
-                }
-            }
-//            node.clearSon();
-//            for (SuperNode re : supernodes) {
-//                node.getFils().add(re);
-//            }
-            //fusion des fils entre eux
-            for (SuperNode sn : this.regionMerge(supernodes)) {
-                supernodes.add(sn);
-            }
-
-        }else supernodes.add(node);
-        return supernodes;
-    }*/
     
-    public void fusion(Node node){
+    /**
+     * 
+     * @param node
+     * @return 
+     */
+    public List<Region> fusion(Node node) {
         //si node a des fils on jump vers les autres fils
         boolean son = node.hasSon();
-        
-        if(son){
+        List<Region> regs = new ArrayList<Region>();
+        if (son) {
             ArrayList<Node> fils = node.getFils();
-            for(Node fil: fils){
-                fusion(fil);
+            for (Node fil : fils) {
+                regs.addAll(fusion(fil));
             }
         }
-        this.Merge(node);
+        //ajoute les regions du noeud
+        if (node.getRegion() != null) {
+            regs.add(node.getRegion());
+        }
+        //fusionner la list
+        this.Merge(regs);
+        return regs;
     }
-
+    
+    /**
+     * 
+     * @return list of the Node which have no son
+     */
     public ArrayList<Node> getFinalNode() {
         Node current;
 
         ArrayList<Node> pile = new ArrayList<Node>();
         ArrayList<Node> FinalNode = new ArrayList<Node>();
-        //ArrayList<Node> res = new ArrayList<Node>();
         pile.add(_root);
 
         while (!pile.isEmpty()) {
@@ -208,12 +173,6 @@ public class Quadtree implements Runnable {
             }
             pile.remove(0);
         }
-        /*for (Node n : FinalNode) {
-            Node f = n.getFather();
-            if (!res.contains(f)) {
-                res.add(f);
-            }
-        }*/
         return FinalNode;
     }
 
@@ -229,6 +188,7 @@ public class Quadtree implements Runnable {
 
         System.out.println("Traitement region");
         this.Node2Region(this.getFinalNode());
+        this.regions_list = this.fusion(_root);
 
         System.out.println("Coloration");
         Mat afficher = new Mat(this.color());
@@ -239,39 +199,59 @@ public class Quadtree implements Runnable {
         waitKey(0);
     }
 
-    private ArrayList<SuperNode> regionMerge(ArrayList<Node> fils) {
-        HashMap<Node, SuperNode> superNodes = new HashMap<>();
-
-        for (Node fils2 : fils) {
-            for (Node fils1 : fils) {
-                if (!fils1.equals(fils2) && this.needMerge(fils1, fils2)) {
-                    //if at least one node at merge the both merge together
-                    if (fils1.isMerged() == true || fils2.isMerged() == true) {
-                        this.mergeIfOneHasMerge(fils1, fils2, superNodes);
-                    } else {
-                        //if not one are merged
-                        SuperNode superNode = new SuperNode(fils1, fils2);
-                        superNodes.put(fils1, superNode);
-                        superNodes.put(fils2, superNode);
-                        fils1.setMerged(true);
-                        fils2.setMerged(true);
-                    }
+    private void Node2Region(ArrayList<Node> fusion) {
+        int cpt = 0;
+        for (Node n : fusion) {
+            Region nouv = new Region(cpt);
+            for (int i = n.getROI().x(); i < n.getROI().width() + n.getROI().x(); i++) {
+                for (int j = n.getROI().y(); j < n.getROI().height() + n.getROI().y(); j++) {
+                    Pixel pix = new Pixel(i, j);
+                    nouv.addMember(pix);
                 }
             }
+            n.setRegion(nouv);
+            cpt++;
         }
-        Collection<SuperNode> values = superNodes.values();
-        ArrayList<SuperNode> finaleNode = new ArrayList<>();
-        values.stream().filter((value) -> (!finaleNode.contains(value))).forEachOrdered((value) -> {
-            finaleNode.add(value);
-        });
-        return finaleNode;
     }
 
-    private boolean needMerge(Node fils1, Node fils2) {
-        return true;/*
-        Pixel pix1 = new Pixel((int) Math.random() * fils1.getROI().width(), (int) Math.random() * fils1.getROI().height());
-        Pixel pix2 = new Pixel((int) Math.random() * fils2.getROI().width(), (int) Math.random() * fils2.getROI().height());
+    private List<Region> Merge(List<Region> regs) {
+      
+        // HashMap<Integer, Region> merge = new HashMap();
+        List<List<Integer>> mergedLink = new ArrayList<>();
+        for (int i = 0; i < regs.size(); i++) {
+            //regions thqt need to merge with the ith region
+            List<Integer> mergedRegI = new ArrayList<>();
+            //get all regions that merge with the ith region
+            for (int j = i + 1; j < regs.size(); j++) {
+                boolean needmerge = this.needMerge(regs.get(i), regs.get(j));
+                if (needmerge) {
+                    mergedRegI.add(j);
+                }
+            }
+            mergedLink.add(mergedRegI);
+        }
+        //merge arrays
+        Quadtree.mergeArray(mergedLink);
+        
+          List<Region> result = new ArrayList<>();
+        for (int i = 0; i < mergedLink.size(); i++) {
+            Region merged = new Region(i);
+            //merge all region of the current list
+            for (Integer ind : mergedLink.get(i)) {
+                merged.merge(regs.get(ind));
+            }
+            result.add(merged);
+        }
+        return result;
 
+        //get all merged regions
+    }
+
+    private boolean needMerge(Region reg1, Region reg2) {
+        //return true;//todo a completer
+        Pixel pix1 = reg1.getMembers().get((int) (Math.random() * reg1.getMembers().size()));
+        Pixel pix2 = reg2.getMembers().get((int) (Math.random() * reg2.getMembers().size()));
+        
         //Récupération colors
         CvScalar color1 = cvGet2D(ipl, pix1.getY(), pix1.getX());
         CvScalar color2 = cvGet2D(ipl, pix2.getY(), pix2.getX());
@@ -290,60 +270,49 @@ public class Quadtree implements Runnable {
         if (this.distColorsRGB(rgb2, rgb1) == 0) {
             return true;
         }
-        return false;*/
+        return false;
     }
 
-    private void Node2Region(ArrayList<Node> fusion) {
-        int cpt = 0;
-        for (Node n : fusion) {
-            Region nouv = new Region(cpt);
-            /*SuperNode sn=(SuperNode) snu;
-            for (Node n : sn.getMembers()) {
-                if (n.getClass() == SuperNode.class) {
-                    System.out.println("ragte");
-                }
-                for (int i = n.getROI().x(); i < n.getROI().width()+n.getROI().x(); i++) {
-                    for (int j = n.getROI().y(); j < n.getROI().height()+n.getROI().y(); j++) {
-                        Pixel pix = new Pixel(i, j);
-                        nouv.addMember(pix);
-                    }
-                }
-            }
-            cpt++;
-            this.regions_list.add(nouv);*/
-            for(int i = n.getROI().x();i<n.getROI().width()+n.getROI().x();i++){
-                for(int j = n.getROI().y();j<n.getROI().height()+n.getROI().y();j++){
-                    Pixel pix = new Pixel(i,j);
-                    nouv.addMember(pix);
-                }
-            }
-            this.regions_list.add(cpt, nouv);
-            cpt++;
-        }
-    }
+    public static void mergeArray(List<List<Integer>> mergedLink) {
+//ici on a liste contenant pour chaque region; la liste des region avec lesquelles elle doit merger
+        boolean change = true;
+        int i = 0;
+        int j = i + 1;
+        while (change && i < mergedLink.size() - 1) {
+            //test if the array i and j have a common index
+            boolean merge = false;
+            int k = 0;
+            while (!merge && k < mergedLink.get(j).size()) {
+                Integer index = mergedLink.get(j).get(k);
+                //test if the index is know
+                if (mergedLink.get(i).contains(index)) {
+                    merge = true;
 
-    private void mergeBothUNDIST(Node fils1, Node fils2, HashMap<Node, SuperNode> superNodes) {
-        //if one of the both nodes has already merged 
-        if (fils1.isMerged()) {
-            //get the super not of the son1
-            SuperNode get = superNodes.get(fils1);
-            if (fils2.isMerged()) {
-                //merge the supernode
-                //add the son2
-                get.addNode(superNodes.get(fils2));//TODO gerer les supernode
-            } else { //add the son2
-                get.addNode(fils2);
-                //flag the son2 is merged
-                fils2.setMerged(true);
-                superNodes.put(fils2, get);
+                } else {
+                    k++;
+                }
+            }
+            if (merge) {
+                //merge the j region
+                mergedLink.get(i).addAll(mergedLink.get(j));
+                //remove the jth region
+                mergedLink.remove(j);
+                change = true;
+                i = 0;
+                j = i + 1;
+            } else {
+                change = false;
+                j++;
+                if (j == mergedLink.size()) {
+                    i++;
+                    j = i + 1;
+                }
             }
         }
     }
-
-    private void mergeIfOneHasMerge(Node fils1, Node fils2, HashMap<Node, SuperNode> superNodes) {
-        if (!fils1.equals(fils2)) {
-            this.mergeBothUNDIST(fils1, fils2, superNodes);
-            this.mergeBothUNDIST(fils2, fils1, superNodes);
-        }
+    
+    public double distColorsRGB(double[] a, double[] b) {
+        return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
+
 }

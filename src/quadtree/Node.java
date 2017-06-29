@@ -50,6 +50,8 @@ public class Node {
     private Rect _ROI;
 
     private Node _father;
+    
+    private Region _region;
 
     public Node(Rect ROI, Mat img, Mat clone, double gap) {
         this.merged = false;
@@ -506,5 +508,19 @@ public class Node {
 
     public void clearSon() {
         this.fils.clear();
+    }
+
+    /**
+     * @return the _region
+     */
+    public Region getRegion() {
+        return _region;
+    }
+
+    /**
+     * @param _region the _region to set
+     */
+    public void setRegion(Region _region) {
+        this._region = _region;
     }
 }
