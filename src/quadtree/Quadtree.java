@@ -180,6 +180,8 @@ public class Quadtree implements Runnable {
 
         System.out.println("Traitement region");
         this.Node2Region(this.getFinalNode());
+                System.out.println("merge region");
+
         this.regions_list = this.fusion(_root);
 
         System.out.println("Coloration");
@@ -215,7 +217,7 @@ public class Quadtree implements Runnable {
      * @param regs 
      * @return list of the merged region
      */
-    private List<Region> Merge(List<Region> regs) {
+    public static List<Region> Merge(List<Region> regs) {
         List<List<Integer>> mergedLink = new ArrayList<>();
         for (int i = 0; i < regs.size(); i++) {
             //regions that need to merge with the ith region
@@ -242,7 +244,6 @@ public class Quadtree implements Runnable {
             result.add(merged);
         }
         return result;
-
         //get all merged regions
     }
 
