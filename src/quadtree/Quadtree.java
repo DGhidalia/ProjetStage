@@ -7,19 +7,11 @@ package quadtree;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import org.bytedeco.javacv.*;
-import org.bytedeco.javacpp.*;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.bytedeco.javacpp.indexer.UByteIndexer;
 
 import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
-import static org.bytedeco.javacpp.opencv_imgcodecs.*;
-import static org.bytedeco.javacpp.opencv_calib3d.*;
-import static org.bytedeco.javacpp.opencv_objdetect.*;
 
 /**
  *
@@ -43,7 +35,7 @@ public class Quadtree implements Runnable {
 
         this.ipl = new IplImage(src);
 
-        this.regions_list = new ArrayList<Region>();
+        this.regions_list = new ArrayList<>();
 
         GAP = 25;
     }
@@ -59,7 +51,7 @@ public class Quadtree implements Runnable {
 
         Node current;
 
-        ArrayList<Node> pile = new ArrayList<Node>();
+        ArrayList<Node> pile = new ArrayList<>();
         pile.add(_root);
 
         while (!pile.isEmpty()) {
@@ -134,7 +126,7 @@ public class Quadtree implements Runnable {
     public List<Region> fusion(Node node) {
         //si node a des fils on jump vers les autres fils
         boolean son = node.hasSon();
-        List<Region> regs = new ArrayList<Region>();
+        List<Region> regs = new ArrayList<>();
         if (son) {
             ArrayList<Node> fils = node.getFils();
             for (Node fil : fils) {
@@ -157,8 +149,8 @@ public class Quadtree implements Runnable {
     public ArrayList<Node> getFinalNode() {
         Node current;
 
-        ArrayList<Node> pile = new ArrayList<Node>();
-        ArrayList<Node> FinalNode = new ArrayList<Node>();
+        ArrayList<Node> pile = new ArrayList<>();
+        ArrayList<Node> FinalNode = new ArrayList<>();
         pile.add(_root);
 
         while (!pile.isEmpty()) {
@@ -199,6 +191,10 @@ public class Quadtree implements Runnable {
         waitKey(0);
     }
 
+    /**
+     * Associate every node to a region 
+     * @param fusion 
+     */
     private void Node2Region(ArrayList<Node> fusion) {
         int cpt = 0;
         for (Node n : fusion) {
@@ -214,12 +210,15 @@ public class Quadtree implements Runnable {
         }
     }
 
+    /**
+     * 
+     * @param regs 
+     * @return list of the merged region
+     */
     private List<Region> Merge(List<Region> regs) {
-      
-        // HashMap<Integer, Region> merge = new HashMap();
         List<List<Integer>> mergedLink = new ArrayList<>();
         for (int i = 0; i < regs.size(); i++) {
-            //regions thqt need to merge with the ith region
+            //regions that need to merge with the ith region
             List<Integer> mergedRegI = new ArrayList<>();
             //get all regions that merge with the ith region
             for (int j = i + 1; j < regs.size(); j++) {
@@ -247,6 +246,12 @@ public class Quadtree implements Runnable {
         //get all merged regions
     }
 
+    /**
+     * Set if two regeion needs to be merge
+     * @param reg1
+     * @param reg2
+     * @return boolean  
+     */
     private boolean needMerge(Region reg1, Region reg2) {
         //return true;//todo a completer
         Pixel pix1 = reg1.getMembers().get((int) (Math.random() * reg1.getMembers().size()));
@@ -267,12 +272,13 @@ public class Quadtree implements Runnable {
         rgb2[1] = color2.green();
         rgb2[2] = color2.blue();
 
-        if (this.distColorsRGB(rgb2, rgb1) == 0) {
-            return true;
-        }
-        return false;
+        return this.distColorsRGB(rgb2, rgb1) == 0;
     }
 
+    /**
+     * Merge list in order to get merged regions
+     * @param mergedLink 
+     */
     public static void mergeArray(List<List<Integer>> mergedLink) {
 //ici on a liste contenant pour chaque region; la liste des region avec lesquelles elle doit merger
         boolean change = true;
